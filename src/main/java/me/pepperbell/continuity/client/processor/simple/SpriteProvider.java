@@ -15,7 +15,7 @@ import net.minecraft.world.level.BlockAndTintGetter;
 
 public interface SpriteProvider {
 	@Nullable
-	TextureAtlasSprite getSprite(QuadView quad, TextureAtlasSprite sprite, BlockAndTintGetter blockView, BlockState appearanceState, BlockState state, BlockPos pos, Supplier<Random> randomSupplier, ProcessingDataProvider dataProvider);
+	TextureAtlasSprite getSprite(QuadView quad, TextureAtlasSprite sprite, BlockAndTintGetter blockView, BlockState appearanceState, BlockState state, BlockPos pos, Supplier<RandomSource> randomSupplier, ProcessingDataProvider dataProvider);
 
 	interface Factory<T extends BaseCtmProperties> {
 		SpriteProvider createSpriteProvider(TextureAtlasSprite[] sprites, T properties);

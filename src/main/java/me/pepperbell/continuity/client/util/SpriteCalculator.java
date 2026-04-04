@@ -44,7 +44,7 @@ public final class SpriteCalculator {
 	@Unmodifiable
 	public static Set<TextureAtlasSprite> calculateSprites(BlockState state, Direction face, Supplier<RandomSource> randomSupplier) {
 		List<TextureAtlasSprite> sprites = new ReferenceArrayList<>();
-		BakedModel model = MODELS.getModel(state);
+		BakedModel model = MODELS.getBlockModel(state);
 		try {
 			for (Direction cullFace : CULL_FACES) {
 				for (BakedQuad quad : model.getQuads(state, cullFace, randomSupplier.get())) {

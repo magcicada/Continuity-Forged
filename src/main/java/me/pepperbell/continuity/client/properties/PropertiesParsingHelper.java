@@ -35,7 +35,7 @@ public final class PropertiesParsingHelper {
 	public static final Predicate<BlockState> EMPTY_BLOCK_STATE_PREDICATE = state -> false;
 
 	@Nullable
-	public static Set<Identifier> parseMatchTiles(Properties properties, String propertyKey, ResourceLocation fileLocation, String packId, @Nullable ResourceRedirectHandler redirectHandler) {
+	public static Set<ResourceLocation> parseMatchTiles(Properties properties, String propertyKey, ResourceLocation fileLocation, String packId, @Nullable ResourceRedirectHandler redirectHandler) {
 		String matchTilesStr = properties.getProperty(propertyKey);
 		if (matchTilesStr == null) {
 			return null;
@@ -44,7 +44,7 @@ public final class PropertiesParsingHelper {
 		String[] matchTileStrs = matchTilesStr.trim().split(" ");
 		if (matchTileStrs.length != 0) {
 			String basePath = FilenameUtils.getPath(fileLocation.getPath());
-			ObjectOpenHashSet<Identifier> set = new ObjectOpenHashSet<>();
+			ObjectOpenHashSet<ResourceLocation> set = new ObjectOpenHashSet<>();
 
 			for (int i = 0; i < matchTileStrs.length; i++) {
 				String matchTileStr = matchTileStrs[i];
@@ -150,7 +150,7 @@ public final class PropertiesParsingHelper {
 						continue;
 					}
 
-					if (BuiltInRegistries.BLOCK.containsId(blockId)) {
+					if (BuiltInRegistries.BLOCK.containsKey(blockId)) {
 						Block block = BuiltInRegistries.BLOCK.get(blockId);
 						if (!blockSet.contains(block)) {
 							if (parts.length > startIndex) {

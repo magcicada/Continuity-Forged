@@ -39,7 +39,7 @@ return empty;
 @Nullable
 public static RenderType getLayer(BlockState state) {
 if (!disableSolidCheck) {
-if (state.isOpaqueFullCube(EmptyBlockGetter.INSTANCE, BlockPos.ORIGIN)) {
+if (state.isSolidRender(EmptyBlockGetter.INSTANCE, BlockPos.ORIGIN)) {
 return null;
 }
 }

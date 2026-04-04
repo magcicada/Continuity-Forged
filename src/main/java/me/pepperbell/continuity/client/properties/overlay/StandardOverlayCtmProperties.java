@@ -17,11 +17,11 @@ import net.minecraft.resources.ResourceLocation;
 public class StandardOverlayCtmProperties extends BasicConnectingCtmProperties implements OverlayPropertiesSection.Provider {
 	protected OverlayPropertiesSection overlaySection;
 	@Nullable
-	protected Set<Identifier> connectTilesSet;
+	protected Set<ResourceLocation> connectTilesSet;
 	@Nullable
 	protected Predicate<BlockState> connectBlocksPredicate;
 
-	public StandardOverlayCtmProperties(Properties properties, ResourceLocation resourceId, ResourcePack pack, int packPriority, ResourceManager resourceManager, String method) {
+	public StandardOverlayCtmProperties(Properties properties, ResourceLocation resourceId, PackResources pack, int packPriority, ResourceManager resourceManager, String method) {
 		super(properties, resourceId, pack, packPriority, resourceManager, method);
 		overlaySection = new OverlayPropertiesSection(properties, resourceId, packId);
 	}
@@ -48,7 +48,7 @@ public class StandardOverlayCtmProperties extends BasicConnectingCtmProperties i
 	}
 
 	@Nullable
-	public Set<Identifier> getConnectTilesSet() {
+	public Set<ResourceLocation> getConnectTilesSet() {
 		return connectTilesSet;
 	}
 

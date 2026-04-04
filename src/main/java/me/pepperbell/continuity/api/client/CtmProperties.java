@@ -15,6 +15,6 @@ public interface CtmProperties extends Comparable<CtmProperties> {
 
 	interface Factory<T extends CtmProperties> {
 		@Nullable
-		T createProperties(Properties properties, ResourceLocation resourceId, ResourcePack pack, int packPriority, ResourceManager resourceManager, String method);
+		T createProperties(Properties properties, ResourceLocation resourceId, PackResources pack, int packPriority, ResourceManager resourceManager, String method);
 	}
 }

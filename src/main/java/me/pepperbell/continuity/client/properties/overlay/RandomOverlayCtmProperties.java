@@ -10,7 +10,7 @@ import net.minecraft.resources.ResourceLocation;
 public class RandomOverlayCtmProperties extends RandomCtmProperties implements OverlayPropertiesSection.Provider {
 	protected OverlayPropertiesSection overlaySection;
 
-	public RandomOverlayCtmProperties(Properties properties, ResourceLocation resourceId, ResourcePack pack, int packPriority, ResourceManager resourceManager, String method) {
+	public RandomOverlayCtmProperties(Properties properties, ResourceLocation resourceId, PackResources pack, int packPriority, ResourceManager resourceManager, String method) {
 		super(properties, resourceId, pack, packPriority, resourceManager, method);
 		overlaySection = new OverlayPropertiesSection(properties, resourceId, packId);
 	}

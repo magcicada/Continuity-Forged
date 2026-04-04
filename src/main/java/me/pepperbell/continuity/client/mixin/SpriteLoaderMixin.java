@@ -37,7 +37,7 @@ abstract class SpriteLoaderMixin {
 	private Supplier<List<Supplier<SpriteContents>>> continuity$modifySupplier(Supplier<List<Supplier<SpriteContents>>> supplier) {
 		SpriteLoaderLoadContext context = SpriteLoaderLoadContext.THREAD_LOCAL.get();
 		if (context != null) {
-			CompletableFuture<@Nullable Set<Identifier>> extraIdsFuture = context.getExtraIdsFuture(id);
+			CompletableFuture<@Nullable Set<ResourceLocation>> extraIdsFuture = context.getExtraIdsFuture(id);
 			SpriteLoaderLoadContext.EmissiveControl emissiveControl = context.getEmissiveControl(id);
 			if (emissiveControl != null) {
 				return () -> {
@@ -66,11 +66,11 @@ abstract class SpriteLoaderMixin {
 			SpriteLoaderLoadContext.EmissiveControl emissiveControl = context.getEmissiveControl(id);
 			if (emissiveControl != null) {
 				return spriteContentsList -> {
-					Map<Identifier, Identifier> emissiveIdMap = emissiveControl.getEmissiveIdMap();
+					Map<ResourceLocation, ResourceLocation> emissiveIdMap = emissiveControl.getEmissiveIdMap();
 					if (emissiveIdMap != null) {
 						SpriteLoaderStitchContext.THREAD_LOCAL.set(new SpriteLoaderStitchContext() {
 							@Override
-							public Map<Identifier, Identifier> getEmissiveIdMap() {
+							public Map<ResourceLocation, ResourceLocation> getEmissiveIdMap() {
 								return emissiveIdMap;
 							}
 
@@ -94,8 +94,8 @@ abstract class SpriteLoaderMixin {
 	private void continuity$onReturnStitch(List<SpriteContents> spriteContentsList, int mipmapLevels, Executor executor, CallbackInfoReturnable<SpriteLoader.StitchResult> cir) {
 		SpriteLoaderStitchContext context = SpriteLoaderStitchContext.THREAD_LOCAL.get();
 		if (context != null) {
-			Map<Identifier, Identifier> emissiveIdMap = context.getEmissiveIdMap();
-			Map<Identifier, TextureAtlasSprite> sprites = cir.getReturnValue().regions();
+			Map<ResourceLocation, ResourceLocation> emissiveIdMap = context.getEmissiveIdMap();
+			Map<ResourceLocation, TextureAtlasSprite> sprites = cir.getReturnValue().regions();
 			emissiveIdMap.forEach((id, emissiveId) -> {
 				TextureAtlasSprite sprite = sprites.get(id);
 				if (sprite != null) {

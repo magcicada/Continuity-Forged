@@ -33,7 +33,7 @@ import net.minecraft.resources.ResourceLocation;
 public class CtmPropertiesLoader {
 	private final ResourceManager resourceManager;
 	private final List<LoadingContainer<?>> containers = new ObjectArrayList<>();
-	private final Map<Identifier, Set<Identifier>> textureDependencies = new Object2ObjectOpenHashMap<>();
+	private final Map<ResourceLocation, Set<ResourceLocation>> textureDependencies = new Object2ObjectOpenHashMap<>();
 
 	private CtmPropertiesLoader(ResourceManager resourceManager) {
 		this.resourceManager = resourceManager;
@@ -57,11 +57,11 @@ public class CtmPropertiesLoader {
 
 	private LoadingResult loadAll() {
 		int packPriority = 0;
-		Iterator<ResourcePack> iterator = resourceManager.streamResourcePacks().iterator();
+		Iterator<PackResources> iterator = resourceManager.listPacks().iterator();
 		BooleanState invalidIdentifierState = InvalidIdentifierStateHolder.get();
 		invalidIdentifierState.enable();
 		while (iterator.hasNext()) {
-			ResourcePack pack = iterator.next();
+			PackResources pack = iterator.next();
 			loadAll(pack, packPriority);
 			packPriority++;
 		}
@@ -72,9 +72,9 @@ public class CtmPropertiesLoader {
 		return new LoadingResult(containers, textureDependencies);
 	}
 
-	private void loadAll(ResourcePack pack, int packPriority) {
+	private void loadAll(PackResources pack, int packPriority) {
 		for (String namespace : pack.getNamespaces(PackType.CLIENT_RESOURCES)) {
-			pack.findResources(PackType.CLIENT_RESOURCES, namespace, "optifine/ctm", (resourceId, inputSupplier) -> {
+			pack.listResources(PackType.CLIENT_RESOURCES, namespace, "optifine/ctm", (resourceId, inputSupplier) -> {
 				if (resourceId.getPath().endsWith(".properties")) {
 					try (InputStream stream = inputSupplier.get()) {
 						Properties properties = new Properties();
@@ -88,7 +88,7 @@ public class CtmPropertiesLoader {
 		}
 	}
 
-	private void load(Properties properties, ResourceLocation resourceId, ResourcePack pack, int packPriority) {
+	private void load(Properties properties, ResourceLocation resourceId, PackResources pack, int packPriority) {
 		String method = properties.getProperty("method", "ctm").trim();
 		CtmLoader<?> loader = CtmLoaderRegistry.get().getLoader(method);
 		if (loader != null) {
@@ -98,14 +98,14 @@ public class CtmPropertiesLoader {
 		}
 	}
 
-	private <T extends CtmProperties> void load(CtmLoader<T> loader, Properties properties, ResourceLocation resourceId, ResourcePack pack, int packPriority, String method) {
+	private <T extends CtmProperties> void load(CtmLoader<T> loader, Properties properties, ResourceLocation resourceId, PackResources pack, int packPriority, String method) {
 		T ctmProperties = loader.getPropertiesFactory().createProperties(properties, resourceId, pack, packPriority, resourceManager, method);
 		if (ctmProperties != null) {
 			LoadingContainer<T> container = new LoadingContainer<>(loader, ctmProperties);
 			containers.add(container);
 			for (Material spriteId : ctmProperties.getTextureDependencies()) {
-				Set<Identifier> atlasTextureDependencies = textureDependencies.computeIfAbsent(spriteId.getAtlasId(), id -> new ObjectOpenHashSet<>());
-				atlasTextureDependencies.add(spriteId.getTextureId());
+				Set<ResourceLocation> atlasTextureDependencies = textureDependencies.computeIfAbsent(spriteId.atlasLocation(), id -> new ObjectOpenHashSet<>());
+				atlasTextureDependencies.add(spriteId.texture());
 			}
 		}
 	}
@@ -125,9 +125,9 @@ public class CtmPropertiesLoader {
 
 	public static class LoadingResult {
 		private final List<LoadingContainer<?>> containers;
-		private final Map<Identifier, Set<Identifier>> textureDependencies;
+		private final Map<ResourceLocation, Set<ResourceLocation>> textureDependencies;
 
-		private LoadingResult(List<LoadingContainer<?>> containers, Map<Identifier, Set<Identifier>> textureDependencies) {
+		private LoadingResult(List<LoadingContainer<?>> containers, Map<ResourceLocation, Set<ResourceLocation>> textureDependencies) {
 			this.containers = containers;
 			this.textureDependencies = textureDependencies;
 		}
@@ -140,7 +140,7 @@ public class CtmPropertiesLoader {
 			return processorHolders;
 		}
 
-		public Map<Identifier, Set<Identifier>> getTextureDependencies() {
+		public Map<ResourceLocation, Set<ResourceLocation>> getTextureDependencies() {
 			return textureDependencies;
 		}
 	}

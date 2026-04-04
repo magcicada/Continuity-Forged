@@ -53,7 +53,7 @@ abstract class BakedModelManagerMixin {
 	}
 
 	@Inject(method = "bake(Lnet/minecraft/util/profiling/ProfilerFiller;Ljava/util/Map;Lnet/minecraft/client/resources/model/ModelBakery;)Lnet/minecraft/client/resources/model/ModelManager$BakingResult;", at = @At("HEAD"))
-	private void continuity$onHeadBake(ProfilerFiller profiler, Map<Identifier, SpriteAtlasManager.AtlasPreparation> preparations, ModelBakery modelLoader, CallbackInfoReturnable<?> cir) {
+	private void continuity$onHeadBake(ProfilerFiller profiler, Map<ResourceLocation, AtlasSet.StitchResult> preparations, ModelBakery modelLoader, CallbackInfoReturnable<?> cir) {
 		BakedModelManagerReloadExtension reloadExtension = continuity$reloadExtension;
 		if (reloadExtension != null) {
 			reloadExtension.beforeBaking(preparations, modelLoader);

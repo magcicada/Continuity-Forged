@@ -73,7 +73,7 @@ public class OverlayPropertiesSection {
 				return;
 			}
 
-			if (BuiltInRegistries.BLOCK.containsId(blockId)) {
+			if (BuiltInRegistries.BLOCK.containsKey(blockId)) {
 				Block block = BuiltInRegistries.BLOCK.get(blockId);
 				tintBlock = block.getDefaultState();
 			} else {

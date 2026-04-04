@@ -15,12 +15,12 @@ import net.minecraft.resources.ResourceLocation;
 
 public class BaseCachingPredicates implements CachingPredicates {
 	@Nullable
-	protected Set<Identifier> spriteIdSet;
+	protected Set<ResourceLocation> spriteIdSet;
 	@Nullable
 	protected Predicate<BlockState> blockStatePredicate;
 	protected boolean isValidForMultipass;
 
-	public BaseCachingPredicates(@Nullable Set<Identifier> spriteIdSet, @Nullable Predicate<BlockState> blockStatePredicate, boolean isValidForMultipass) {
+	public BaseCachingPredicates(@Nullable Set<ResourceLocation> spriteIdSet, @Nullable Predicate<BlockState> blockStatePredicate, boolean isValidForMultipass) {
 		this.spriteIdSet = spriteIdSet;
 		this.blockStatePredicate = blockStatePredicate;
 		this.isValidForMultipass = isValidForMultipass;
@@ -34,7 +34,7 @@ public class BaseCachingPredicates implements CachingPredicates {
 	@Override
 	public boolean affectsSprite(TextureAtlasSprite sprite) {
 		if (spriteIdSet != null) {
-			return spriteIdSet.contains(sprite.getContents().getId());
+			return spriteIdSet.contains(sprite.contents().name());
 		}
 		return false;
 	}

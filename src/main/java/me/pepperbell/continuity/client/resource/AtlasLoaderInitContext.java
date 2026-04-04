@@ -10,5 +10,5 @@ public interface AtlasLoaderInitContext {
 	ThreadLocal<AtlasLoaderInitContext> THREAD_LOCAL = new ThreadLocal<>();
 
 	@Nullable
-	Set<Identifier> getExtraIds();
+	Set<ResourceLocation> getExtraIds();
 }

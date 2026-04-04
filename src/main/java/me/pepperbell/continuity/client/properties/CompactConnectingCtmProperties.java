@@ -16,11 +16,11 @@ public class CompactConnectingCtmProperties extends OrientedConnectingCtmPropert
 	@Nullable
 	protected Int2IntMap tileReplacementMap;
 
-	public CompactConnectingCtmProperties(Properties properties, ResourceLocation resourceId, ResourcePack pack, int packPriority, ResourceManager resourceManager, String method, OrientationMode defaultOrientationMode) {
+	public CompactConnectingCtmProperties(Properties properties, ResourceLocation resourceId, PackResources pack, int packPriority, ResourceManager resourceManager, String method, OrientationMode defaultOrientationMode) {
 		super(properties, resourceId, pack, packPriority, resourceManager, method, defaultOrientationMode);
 	}
 
-	public CompactConnectingCtmProperties(Properties properties, ResourceLocation resourceId, ResourcePack pack, int packPriority, ResourceManager resourceManager, String method) {
+	public CompactConnectingCtmProperties(Properties properties, ResourceLocation resourceId, PackResources pack, int packPriority, ResourceManager resourceManager, String method) {
 		this(properties, resourceId, pack, packPriority, resourceManager, method, OrientationMode.TEXTURE);
 	}
 

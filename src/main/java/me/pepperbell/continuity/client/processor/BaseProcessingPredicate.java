@@ -49,9 +49,9 @@ public class BaseProcessingPredicate implements ProcessingPredicate {
  			if (appearanceState.contains(BlockStateProperties.AXIS)) {
  				Direction.Axis axis = appearanceState.get(BlockStateProperties.AXIS);
  				if (axis == Direction.Axis.X) {
- 					face = face.rotateClockwise(Direction.Axis.Z);
+ 					face = face.getClockWise(Direction.Axis.Z);
 				} else if (axis == Direction.Axis.Z) {
-					face = face.rotateCounterclockwise(Direction.Axis.X);
+					face = face.getCounterClockWise(Direction.Axis.X);
 				}
 			}
 			if (!faces.contains(face)) {

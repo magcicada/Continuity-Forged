@@ -37,11 +37,11 @@ import net.minecraft.world.level.BlockAndTintGetter;
 
 public class StandardOverlayQuadProcessor extends AbstractQuadProcessor {
 	@Nullable
-	protected Set<Identifier> matchTilesSet;
+	protected Set<ResourceLocation> matchTilesSet;
 	@Nullable
 	protected Predicate<BlockState> matchBlocksPredicate;
 	@Nullable
-	protected Set<Identifier> connectTilesSet;
+	protected Set<ResourceLocation> connectTilesSet;
 	@Nullable
 	protected Predicate<BlockState> connectBlocksPredicate;
 	protected ConnectionPredicate connectionPredicate;
@@ -51,7 +51,7 @@ public class StandardOverlayQuadProcessor extends AbstractQuadProcessor {
 	protected BlockState tintBlock;
 	protected RenderMaterial material;
 
-	public StandardOverlayQuadProcessor(TextureAtlasSprite[] sprites, ProcessingPredicate processingPredicate, @Nullable Set<Identifier> matchTilesSet, @Nullable Predicate<BlockState> matchBlocksPredicate, @Nullable Set<Identifier> connectTilesSet, @Nullable Predicate<BlockState> connectBlocksPredicate, ConnectionPredicate connectionPredicate, int tintIndex, @Nullable BlockState tintBlock, BlendMode layer) {
+	public StandardOverlayQuadProcessor(TextureAtlasSprite[] sprites, ProcessingPredicate processingPredicate, @Nullable Set<ResourceLocation> matchTilesSet, @Nullable Predicate<BlockState> matchBlocksPredicate, @Nullable Set<ResourceLocation> connectTilesSet, @Nullable Predicate<BlockState> connectBlocksPredicate, ConnectionPredicate connectionPredicate, int tintIndex, @Nullable BlockState tintBlock, BlendMode layer) {
 		super(sprites, processingPredicate);
 		this.matchTilesSet = matchTilesSet;
 		this.matchBlocksPredicate = matchBlocksPredicate;
@@ -83,9 +83,9 @@ public class StandardOverlayQuadProcessor extends AbstractQuadProcessor {
 		return ProcessingResult.NEXT_PROCESSOR;
 	}
 
-	protected static boolean matchesAny(Set<Identifier> tiles, Set<TextureAtlasSprite> sprites) {
+	protected static boolean matchesAny(Set<ResourceLocation> tiles, Set<TextureAtlasSprite> sprites) {
 		for (TextureAtlasSprite sprite : sprites) {
-			if (tiles.contains(sprite.getContents().getId())) {
+			if (tiles.contains(sprite.contents().name())) {
 				return true;
 			}
 		}
@@ -96,7 +96,7 @@ public class StandardOverlayQuadProcessor extends AbstractQuadProcessor {
 		// OptiFine never applies overlays from blocks with dynamic bounds. To improve mod compatibility, call
 		// isFullCube with the correct values and do not check for dynamic bounds explicitly. For vanilla blocks, this
 		// change only makes it so retracted pistons and shulker boxes can apply overlays.
-		if (!otherState.isFullCube(blockView, otherPos)) {
+		if (!otherState.isCollisionShapeFullBlock(blockView, otherPos)) {
 			return false;
 		}
 		if (connectBlocksPredicate != null) {
@@ -135,7 +135,7 @@ public class StandardOverlayQuadProcessor extends AbstractQuadProcessor {
 		BlockState otherAppearanceState = otherState.getAppearance(blockView, mutablePos, lightFace, state, pos);
 		if (appliesOverlay(otherAppearanceState, otherState, mutablePos, blockView, appearanceState, state, pos, lightFace, quadSprite)) {
 			mutablePos.move(lightFace);
-			return !blockView.getBlockState(mutablePos).isOpaqueFullCube(blockView, mutablePos);
+			return !blockView.getBlockState(mutablePos).isSolidRender(blockView, mutablePos);
 		}
 		return false;
 	}
@@ -228,7 +228,7 @@ public class StandardOverlayQuadProcessor extends AbstractQuadProcessor {
 
 		mutablePos.set(pos, directions[0]).move(lightFace);
 		BlockState appearanceState0;
-		if (!blockView.getBlockState(mutablePos).isOpaqueFullCube(blockView, mutablePos)) {
+		if (!blockView.getBlockState(mutablePos).isSolidRender(blockView, mutablePos)) {
 			mutablePos.set(pos, directions[0]);
 			BlockState state0 = blockView.getBlockState(mutablePos);
 			appearanceState0 = state0.getAppearance(blockView, mutablePos, lightFace, state, pos);
@@ -241,7 +241,7 @@ public class StandardOverlayQuadProcessor extends AbstractQuadProcessor {
 
 		mutablePos.set(pos, directions[1]).move(lightFace);
 		BlockState appearanceState1;
-		if (!blockView.getBlockState(mutablePos).isOpaqueFullCube(blockView, mutablePos)) {
+		if (!blockView.getBlockState(mutablePos).isSolidRender(blockView, mutablePos)) {
 			mutablePos.set(pos, directions[1]);
 			BlockState state1 = blockView.getBlockState(mutablePos);
 			appearanceState1 = state1.getAppearance(blockView, mutablePos, lightFace, state, pos);
@@ -254,7 +254,7 @@ public class StandardOverlayQuadProcessor extends AbstractQuadProcessor {
 
 		mutablePos.set(pos, directions[2]).move(lightFace);
 		BlockState appearanceState2;
-		if (!blockView.getBlockState(mutablePos).isOpaqueFullCube(blockView, mutablePos)) {
+		if (!blockView.getBlockState(mutablePos).isSolidRender(blockView, mutablePos)) {
 			mutablePos.set(pos, directions[2]);
 			BlockState state2 = blockView.getBlockState(mutablePos);
 			appearanceState2 = state2.getAppearance(blockView, mutablePos, lightFace, state, pos);
@@ -267,7 +267,7 @@ public class StandardOverlayQuadProcessor extends AbstractQuadProcessor {
 
 		mutablePos.set(pos, directions[3]).move(lightFace);
 		BlockState appearanceState3;
-		if (!blockView.getBlockState(mutablePos).isOpaqueFullCube(blockView, mutablePos)) {
+		if (!blockView.getBlockState(mutablePos).isSolidRender(blockView, mutablePos)) {
 			mutablePos.set(pos, directions[3]);
 			BlockState state3 = blockView.getBlockState(mutablePos);
 			appearanceState3 = state3.getAppearance(blockView, mutablePos, lightFace, state, pos);

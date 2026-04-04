@@ -21,9 +21,9 @@ public final class DirectionMaps {
 
 			Direction textureLeft;
 			if (face.getDirection() == Direction.AxisDirection.NEGATIVE) {
-				textureLeft = textureUp.rotateClockwise(face.getAxis());
+				textureLeft = textureUp.getClockWise(face.getAxis());
 			} else {
-				textureLeft = textureUp.rotateCounterclockwise(face.getAxis());
+				textureLeft = textureUp.getCounterClockWise(face.getAxis());
 			}
 
 			Direction[][] map = DIRECTION_MAPS[face.ordinal()];

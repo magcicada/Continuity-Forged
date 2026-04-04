@@ -11,12 +11,12 @@ import net.minecraft.resources.ResourceLocation;
 public class OrientedConnectingOverlayCtmProperties extends OrientedConnectingCtmProperties implements OverlayPropertiesSection.Provider {
 	protected OverlayPropertiesSection overlaySection;
 
-	public OrientedConnectingOverlayCtmProperties(Properties properties, ResourceLocation resourceId, ResourcePack pack, int packPriority, ResourceManager resourceManager, String method, OrientationMode defaultOrientationMode) {
+	public OrientedConnectingOverlayCtmProperties(Properties properties, ResourceLocation resourceId, PackResources pack, int packPriority, ResourceManager resourceManager, String method, OrientationMode defaultOrientationMode) {
 		super(properties, resourceId, pack, packPriority, resourceManager, method, defaultOrientationMode);
 		overlaySection = new OverlayPropertiesSection(properties, resourceId, packId);
 	}
 
-	public OrientedConnectingOverlayCtmProperties(Properties properties, ResourceLocation resourceId, ResourcePack pack, int packPriority, ResourceManager resourceManager, String method) {
+	public OrientedConnectingOverlayCtmProperties(Properties properties, ResourceLocation resourceId, PackResources pack, int packPriority, ResourceManager resourceManager, String method) {
 		this(properties, resourceId, pack, packPriority, resourceManager, method, OrientationMode.NONE);
 	}
 

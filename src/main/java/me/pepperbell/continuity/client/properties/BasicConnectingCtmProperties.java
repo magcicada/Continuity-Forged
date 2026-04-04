@@ -18,7 +18,7 @@ import net.minecraft.world.level.BlockAndTintGetter;
 public class BasicConnectingCtmProperties extends BaseCtmProperties {
 	protected ConnectionPredicate connectionPredicate;
 
-	public BasicConnectingCtmProperties(Properties properties, ResourceLocation resourceId, ResourcePack pack, int packPriority, ResourceManager resourceManager, String method) {
+	public BasicConnectingCtmProperties(Properties properties, ResourceLocation resourceId, PackResources pack, int packPriority, ResourceManager resourceManager, String method) {
 		super(properties, resourceId, pack, packPriority, resourceManager, method);
 	}
 

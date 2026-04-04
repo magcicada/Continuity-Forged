@@ -58,10 +58,10 @@ public class BaseCtmProperties implements CtmProperties {
 	protected String method;
 
 	@Nullable
-	protected Set<Identifier> matchTilesSet;
+	protected Set<ResourceLocation> matchTilesSet;
 	@Nullable
 	protected Predicate<BlockState> matchBlocksPredicate;
-	protected List<Identifier> tiles = Collections.emptyList();
+	protected List<ResourceLocation> tiles = Collections.emptyList();
 	@Nullable
 	protected EnumSet<Direction> faces;
 	@Nullable
@@ -77,7 +77,7 @@ public class BaseCtmProperties implements CtmProperties {
 	protected Set<Material> textureDependencies;
 	protected List<Material> spriteIds;
 
-	public BaseCtmProperties(Properties properties, ResourceLocation resourceId, ResourcePack pack, int packPriority, ResourceManager resourceManager, String method) {
+	public BaseCtmProperties(Properties properties, ResourceLocation resourceId, PackResources pack, int packPriority, ResourceManager resourceManager, String method) {
 		this.properties = properties;
 		this.resourceId = resourceId;
 		this.packId = pack.getName();
@@ -153,7 +153,7 @@ public class BaseCtmProperties implements CtmProperties {
 			if (baseName.startsWith("block_")) {
 				try {
 					ResourceLocation id = new ResourceLocation(baseName.substring(6));
-					if (BuiltInRegistries.BLOCK.containsId(id)) {
+					if (BuiltInRegistries.BLOCK.containsKey(id)) {
 						Block block = BuiltInRegistries.BLOCK.get(id);
 						matchBlocksPredicate = state -> state.getBlock() == block;
 					}
@@ -182,7 +182,7 @@ public class BaseCtmProperties implements CtmProperties {
 		String[] tileStrs = tilesStr.trim().split("[ ,]");
 		if (tileStrs.length != 0) {
 			String basePath = FilenameUtils.getPath(resourceId.getPath());
-			ImmutableList.Builder<Identifier> listBuilder = ImmutableList.builder();
+			ImmutableList.Builder<ResourceLocation> listBuilder = ImmutableList.builder();
 
 			for (int i = 0; i < tileStrs.length; i++) {
 				String tileStr = tileStrs[i];
@@ -677,7 +677,7 @@ public class BaseCtmProperties implements CtmProperties {
 	}
 
 	@Nullable
-	public Set<Identifier> getMatchTilesSet() {
+	public Set<ResourceLocation> getMatchTilesSet() {
 		return matchTilesSet;
 	}
 

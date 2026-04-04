@@ -29,7 +29,7 @@ abstract class LifecycledResourceManagerImplMixin implements MultiPackResourceMa
 	}
 
 	@Inject(method = "<init>(Lnet/minecraft/server/packs/PackType;Ljava/util/List;)V", at = @At("TAIL"))
-	private void continuity$onTailInit(PackType type, List<ResourcePack> packs, CallbackInfo ci) {
+	private void continuity$onTailInit(PackType type, List<PackResources> packs, CallbackInfo ci) {
 		if (type == PackType.CLIENT_RESOURCES) {
 			continuity$redirectHandler = new ResourceRedirectHandler();
 		}

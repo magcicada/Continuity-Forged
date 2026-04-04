@@ -11,16 +11,16 @@ import net.minecraft.resources.ResourceLocation;
 public interface SpriteLoaderLoadContext {
 	ThreadLocal<SpriteLoaderLoadContext> THREAD_LOCAL = new ThreadLocal<>();
 
-	CompletableFuture<@Nullable Set<Identifier>> getExtraIdsFuture(ResourceLocation atlasId);
+	CompletableFuture<@Nullable Set<ResourceLocation>> getExtraIdsFuture(ResourceLocation atlasId);
 
 	@Nullable
 	EmissiveControl getEmissiveControl(ResourceLocation atlasId);
 
 	interface EmissiveControl {
 		@Nullable
-		Map<Identifier, Identifier> getEmissiveIdMap();
+		Map<ResourceLocation, ResourceLocation> getEmissiveIdMap();
 
-		void setEmissiveIdMap(Map<Identifier, Identifier> emissiveIdMap);
+		void setEmissiveIdMap(Map<ResourceLocation, ResourceLocation> emissiveIdMap);
 
 		void markHasEmissives();
 	}

@@ -12,13 +12,12 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import me.pepperbell.continuity.api.client.ProcessingDataKey;
 import me.pepperbell.continuity.api.client.ProcessingDataKeyRegistry;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraft.resources.ResourceLocation;
 
 public final class ProcessingDataKeyRegistryImpl implements ProcessingDataKeyRegistry {
 	public static final ProcessingDataKeyRegistryImpl INSTANCE = new ProcessingDataKeyRegistryImpl();
 
-	private final Map<Identifier, ProcessingDataKey<?>> keyMap = new Object2ObjectOpenHashMap<>();
+	private final Map<ResourceLocation, ProcessingDataKey<?>> keyMap = new Object2ObjectOpenHashMap<>();
 	private final List<ProcessingDataKey<?>> allResettable = new ObjectArrayList<>();
 	private final List<ProcessingDataKey<?>> allResettableView = Collections.unmodifiableList(allResettable);
 
@@ -55,7 +54,7 @@ public final class ProcessingDataKeyRegistryImpl implements ProcessingDataKeyReg
 	}
 
 	public void init() {
-		ClientLifecycleEvents.CLIENT_STARTED.register(client -> frozen = true);
+		frozen = true;
 	}
 
 	public List<ProcessingDataKey<?>> getAllResettable() {

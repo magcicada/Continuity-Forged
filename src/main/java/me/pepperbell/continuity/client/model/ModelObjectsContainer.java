@@ -11,7 +11,7 @@ public class ModelObjectsContainer {
 	public final EmissiveBakedModel.EmissiveItemQuadTransform emissiveItemQuadTransform = new EmissiveBakedModel.EmissiveItemQuadTransform();
 
 	public final ContinuityFeatureStatesImpl featureStates = new ContinuityFeatureStatesImpl();
-	public final MeshBuilder meshBuilder = RendererAccess.INSTANCE.getRenderer().meshBuilder();
+	public final MeshBuilder meshBuilder = new MeshBuilder();
 
 	public static ModelObjectsContainer get() {
 		return THREAD_LOCAL.get();

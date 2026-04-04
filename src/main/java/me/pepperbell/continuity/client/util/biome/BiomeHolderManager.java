@@ -7,15 +7,14 @@ import org.jetbrains.annotations.Nullable;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
-import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
 
 public final class BiomeHolderManager {
-	private static final Map<Identifier, BiomeHolder> HOLDER_CACHE = new Object2ObjectOpenHashMap<>();
+	private static final Map<ResourceLocation, BiomeHolder> HOLDER_CACHE = new Object2ObjectOpenHashMap<>();
 	private static final Set<Runnable> REFRESH_CALLBACKS = new ReferenceOpenHashSet<>();
 
 	@Nullable
@@ -30,10 +29,10 @@ public final class BiomeHolderManager {
 	}
 
 	public static void init() {
-		ClientPlayConnectionEvents.JOIN.register(((handler, sender, client) -> {
-			registryManager = handler.getRegistryManager();
+		net.minecraftforge.common.MinecraftForge.EVENT_BUS.addListener((net.minecraftforge.client.event.ClientPlayerNetworkEvent.LoggingIn event) -> {
+			registryManager = event.getPlayer().connection.registryAccess();
 			refreshHolders();
-		}));
+		});
 	}
 
 	public static void refreshHolders() {
@@ -41,14 +40,14 @@ public final class BiomeHolderManager {
 			return;
 		}
 
-		Map<Identifier, Identifier> compactIdMap = new Object2ObjectOpenHashMap<>();
-		Registry<Biome> biomeRegistry = registryManager.get(Registries.BIOME);
-		for (ResourceLocation id : biomeRegistry.getIds()) {
+		Map<ResourceLocation, ResourceLocation> compactIdMap = new Object2ObjectOpenHashMap<>();
+		Registry<Biome> biomeRegistry = registryManager.registryOrThrow(Registries.BIOME);
+		for (ResourceLocation id : biomeRegistry.keySet()) {
 			String path = id.getPath();
 			String compactPath = path.replace("_", "");
 			if (!path.equals(compactPath)) {
 				ResourceLocation compactId = id.withPath(compactPath);
-				if (!biomeRegistry.containsId(compactId)) {
+				if (!biomeRegistry.containsKey(compactId)) {
 					compactIdMap.put(compactId, id);
 				}
 			}

@@ -1,11 +1,11 @@
 package me.pepperbell.continuity.client.config;
 
-import com.terraformersmc.modmenu.api.ConfigScreenFactory;
-import com.terraformersmc.modmenu.api.ModMenuApi;
+import net.minecraftforge.client.ConfigScreenHandler;
+import net.minecraftforge.fml.ModLoadingContext;
 
-public class ModMenuApiImpl implements ModMenuApi {
-	@Override
-	public ConfigScreenFactory<?> getModConfigScreenFactory() {
-		return parent -> new ContinuityConfigScreen(parent, ContinuityConfig.INSTANCE);
+public class ModMenuApiImpl {
+	public static void register() {
+		ModLoadingContext.get().registerExtensionPoint(ConfigScreenHandler.ConfigScreenFactory.class,
+				() -> new ConfigScreenHandler.ConfigScreenFactory((mc, parent) -> new ContinuityConfigScreen(parent, ContinuityConfig.INSTANCE)));
 	}
 }

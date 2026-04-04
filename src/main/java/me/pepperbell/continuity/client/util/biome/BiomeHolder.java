@@ -27,12 +27,12 @@ public final class BiomeHolder {
 		return biome;
 	}
 
-	void refresh(Registry<Biome> biomeRegistry, Map<Identifier, Identifier> compactIdMap) {
+	void refresh(Registry<Biome> biomeRegistry, Map<ResourceLocation, ResourceLocation> compactIdMap) {
 		ResourceLocation id = compactIdMap.get(this.id);
 		if (id == null) {
 			id = this.id;
 		}
-		if (biomeRegistry.containsId(id)) {
+		if (biomeRegistry.containsKey(id)) {
 			biome = biomeRegistry.get(id);
 		} else {
 			ContinuityClient.LOGGER.warn("Unknown biome '" + this.id + "'");

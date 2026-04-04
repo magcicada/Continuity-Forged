@@ -16,7 +16,7 @@ import me.pepperbell.continuity.client.render.QuadEmitter;
 public class ProcessingContextImpl implements QuadProcessor.ProcessingContext {
 	protected final List<Consumer<QuadEmitter>> emitterConsumers = new ObjectArrayList<>();
 	protected final List<Mesh> meshes = new ObjectArrayList<>();
-	protected final MeshBuilder meshBuilder = RendererAccess.INSTANCE.getRenderer().meshBuilder();
+	protected final MeshBuilder meshBuilder = new MeshBuilder();
 	protected final Object[] processingData = new Object[ProcessingDataKeyRegistry.get().getRegisteredAmount()];
 
 	protected boolean hasExtraQuads;

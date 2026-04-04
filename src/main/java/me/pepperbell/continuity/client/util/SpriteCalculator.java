@@ -31,7 +31,9 @@ public final class SpriteCalculator {
 			SPRITE_CACHES.put(direction, new SpriteCache(direction));
 		}
 
-		InvalidateRenderStateCallback.EVENT.register(SpriteCalculator::clearCache);
+		net.minecraftforge.common.MinecraftForge.EVENT_BUS.addListener((net.minecraftforge.event.level.LevelEvent.Unload event) -> {
+			SpriteCalculator.clearCache();
+		});
 	}
 
 	@Unmodifiable
@@ -40,7 +42,7 @@ public final class SpriteCalculator {
 	}
 
 	@Unmodifiable
-	public static Set<TextureAtlasSprite> calculateSprites(BlockState state, Direction face, Supplier<Random> randomSupplier) {
+	public static Set<TextureAtlasSprite> calculateSprites(BlockState state, Direction face, Supplier<RandomSource> randomSupplier) {
 		List<TextureAtlasSprite> sprites = new ReferenceArrayList<>();
 		BakedModel model = MODELS.getModel(state);
 		try {
@@ -66,11 +68,11 @@ public final class SpriteCalculator {
 	private static class SpriteCache {
 		private final Direction face;
 		private final Reference2ObjectOpenHashMap<BlockState, Set<TextureAtlasSprite>> spritesMap = new Reference2ObjectOpenHashMap<>();
-		private final Supplier<Random> randomSupplier = new Supplier<>() {
-			private final Random random = RandomSource.create();
+		private final Supplier<RandomSource> randomSupplier = new Supplier<>() {
+			private final RandomSource random = RandomSource.create();
 
 			@Override
-			public Random get() {
+			public RandomSource get() {
 				// Use item rendering seed for consistency
 				random.setSeed(42L);
 				return random;

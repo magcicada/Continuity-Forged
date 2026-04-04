@@ -2,8 +2,7 @@ package me.pepperbell.continuity.client.util.biome;
 
 import org.jetbrains.annotations.Nullable;
 
-import grondag.canvas.terrain.region.input.InputRegion;
-import net.minecraftforge.fml.loading.FMLPaths;
+import net.minecraftforge.fml.ModList;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.biome.Biome;
@@ -15,7 +14,7 @@ public final class BiomeRetriever {
 	private static Provider createProvider() {
 		ClassLoader classLoader = BiomeRetriever.class.getClassLoader();
 
-		if (FabricLoader.getInstance().isModLoaded("canvas")) {
+		if (ModList.get().isLoaded("canvas")) {
 			try {
 				Class<?> inputRegionClass = Class.forName("grondag.canvas.terrain.region.input.InputRegion", false, classLoader);
 				inputRegionClass.getMethod("getBiome", BlockPos.class);
@@ -35,17 +34,22 @@ public final class BiomeRetriever {
 
 	@Nullable
 	private static Biome getBiomeByAPI(BlockAndTintGetter blockView, BlockPos pos) {
-		if (blockView.hasBiomes()) {
-			return blockView.getBiomeFabric(pos).value();
+		try {
+			return blockView.getBiome(pos).value();
+		} catch (Exception e) {
+			return null;
 		}
-		return null;
 	}
 
 	// Canvas
 	@Nullable
 	private static Biome getBiomeByInputRegion(BlockAndTintGetter blockView, BlockPos pos) {
-		if (blockView instanceof InputRegion inputRegion) {
-			return inputRegion.getBiome(pos);
+		try {
+			if (blockView instanceof grondag.canvas.terrain.region.input.InputRegion inputRegion) {
+				return inputRegion.getBiome(pos);
+			}
+		} catch (Exception e) {
+			//
 		}
 		return getBiomeByAPI(blockView, pos);
 	}

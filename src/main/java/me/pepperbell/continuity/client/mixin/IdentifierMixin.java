@@ -10,7 +10,7 @@ import net.minecraft.resources.ResourceLocation;
 
 @Mixin(ResourceLocation.class)
 abstract class IdentifierMixin {
-	@Inject(method = "isPathValid(Ljava/lang/String;)Z", at = @At("HEAD"), cancellable = true)
+	@Inject(method = "isValidPath(Ljava/lang/String;)Z", at = @At("HEAD"), cancellable = true)
 	private static void continuity$onIsPathValid(CallbackInfoReturnable<Boolean> cir) {
 		if (InvalidIdentifierStateHolder.get().isEnabled()) {
 			cir.setReturnValue(true);

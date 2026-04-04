@@ -13,7 +13,7 @@ import net.minecraft.client.renderer.ItemBlockRenderTypes;
 
 @Mixin(ItemBlockRenderTypes.class)
 abstract class RenderLayersMixin {
-	@Inject(method = "getBlockLayer(Lnet/minecraft/block/BlockState;)Lnet/minecraft/client/render/RenderType;", at = @At("HEAD"), cancellable = true)
+	@Inject(method = "getChunkRenderType(Lnet/minecraft/world/level/block/state/BlockState;)Lnet/minecraft/client/renderer/RenderType;", at = @At("HEAD"), cancellable = true)
 	private static void continuity$onHeadGetBlockLayer(BlockState state, CallbackInfoReturnable<RenderType> cir) {
 		if (!CustomBlockLayers.isEmpty() && ContinuityConfig.INSTANCE.customBlockLayers.get()) {
 			RenderType layer = CustomBlockLayers.getLayer(state);
@@ -23,7 +23,7 @@ abstract class RenderLayersMixin {
 		}
 	}
 
-	@Inject(method = "getMovingBlockLayer(Lnet/minecraft/block/BlockState;)Lnet/minecraft/client/render/RenderType;", at = @At("HEAD"), cancellable = true)
+	@Inject(method = "getMovingBlockRenderType(Lnet/minecraft/world/level/block/state/BlockState;)Lnet/minecraft/client/renderer/RenderType;", at = @At("HEAD"), cancellable = true)
 	private static void continuity$onHeadGetMovingBlockLayer(BlockState state, CallbackInfoReturnable<RenderType> cir) {
 		if (!CustomBlockLayers.isEmpty() && ContinuityConfig.INSTANCE.customBlockLayers.get()) {
 			RenderType layer = CustomBlockLayers.getLayer(state);

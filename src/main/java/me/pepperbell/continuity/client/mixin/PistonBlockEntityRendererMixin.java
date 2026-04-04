@@ -6,9 +6,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import me.pepperbell.continuity.api.client.ContinuityFeatureStates;
-import net.minecraft.client.render.block.entity.PistonBlockEntityRenderer;
+import net.minecraft.client.renderer.blockentity.PistonHeadRenderer;
 
-@Mixin(PistonBlockEntityRenderer.class)
+@Mixin(PistonHeadRenderer.class)
 abstract class PistonBlockEntityRendererMixin {
 	@Inject(method = "render(Lnet/minecraft/block/entity/PistonBlockEntity;FLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;II)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/block/BlockModelRenderer;enableBrightnessCache()V"))
 	private void continuity$beforeRenderModels(CallbackInfo ci) {

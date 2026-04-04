@@ -22,16 +22,16 @@ import me.pepperbell.continuity.client.resource.AtlasLoaderInitContext;
 import me.pepperbell.continuity.client.resource.AtlasLoaderLoadContext;
 import me.pepperbell.continuity.client.resource.SpriteLoaderLoadContext;
 import me.pepperbell.continuity.client.resource.SpriteLoaderStitchContext;
-import net.minecraft.client.texture.Sprite;
-import net.minecraft.client.texture.SpriteContents;
-import net.minecraft.client.texture.SpriteLoader;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.texture.SpriteContents;
+import net.minecraft.client.renderer.texture.SpriteLoader;
+import net.minecraft.resources.ResourceLocation;
 
 @Mixin(SpriteLoader.class)
 abstract class SpriteLoaderMixin {
 	@Shadow
 	@Final
-	private Identifier id;
+	private ResourceLocation id;
 
 	@ModifyArg(method = "load(Lnet/minecraft/resource/ResourceManager;Lnet/minecraft/util/Identifier;ILjava/util/concurrent/Executor;)Ljava/util/concurrent/CompletableFuture;", at = @At(value = "INVOKE", target = "Ljava/util/concurrent/CompletableFuture;supplyAsync(Ljava/util/function/Supplier;Ljava/util/concurrent/Executor;)Ljava/util/concurrent/CompletableFuture;", ordinal = 0), index = 0)
 	private Supplier<List<Supplier<SpriteContents>>> continuity$modifySupplier(Supplier<List<Supplier<SpriteContents>>> supplier) {
@@ -95,11 +95,11 @@ abstract class SpriteLoaderMixin {
 		SpriteLoaderStitchContext context = SpriteLoaderStitchContext.THREAD_LOCAL.get();
 		if (context != null) {
 			Map<Identifier, Identifier> emissiveIdMap = context.getEmissiveIdMap();
-			Map<Identifier, Sprite> sprites = cir.getReturnValue().regions();
+			Map<Identifier, TextureAtlasSprite> sprites = cir.getReturnValue().regions();
 			emissiveIdMap.forEach((id, emissiveId) -> {
-				Sprite sprite = sprites.get(id);
+				TextureAtlasSprite sprite = sprites.get(id);
 				if (sprite != null) {
-					Sprite emissiveSprite = sprites.get(emissiveId);
+					TextureAtlasSprite emissiveSprite = sprites.get(emissiveId);
 					if (emissiveSprite != null) {
 						((SpriteExtension) sprite).continuity$setEmissiveSprite(emissiveSprite);
 						context.markHasEmissives();

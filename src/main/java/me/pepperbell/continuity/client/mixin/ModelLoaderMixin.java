@@ -6,9 +6,9 @@ import org.spongepowered.asm.mixin.Unique;
 
 import me.pepperbell.continuity.client.mixinterface.ModelLoaderExtension;
 import me.pepperbell.continuity.client.resource.ModelWrappingHandler;
-import net.minecraft.client.render.model.ModelLoader;
+import net.minecraft.client.resources.model.ModelBakery;
 
-@Mixin(ModelLoader.class)
+@Mixin(ModelBakery.class)
 abstract class ModelLoaderMixin implements ModelLoaderExtension {
 	@Unique
 	@Nullable

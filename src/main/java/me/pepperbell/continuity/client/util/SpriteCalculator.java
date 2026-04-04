@@ -11,18 +11,17 @@ import org.jetbrains.annotations.Unmodifiable;
 
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ReferenceArrayList;
-import net.fabricmc.fabric.api.client.rendering.v1.InvalidateRenderStateCallback;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.block.BlockModels;
-import net.minecraft.client.render.model.BakedModel;
-import net.minecraft.client.render.model.BakedQuad;
-import net.minecraft.client.texture.Sprite;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.random.Random;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.block.BlockModelShaper;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.core.Direction;
+import net.minecraft.util.RandomSource;
 
 public final class SpriteCalculator {
-	private static final BlockModels MODELS = MinecraftClient.getInstance().getBakedModelManager().getBlockModels();
+	private static final BlockModelShaper MODELS = Minecraft.getInstance().getModelManager().getBlockModelShaper();
 	private static final Direction[] CULL_FACES = ArrayUtils.add(Direction.values(), null);
 
 	private static final EnumMap<Direction, SpriteCache> SPRITE_CACHES = new EnumMap<>(Direction.class);
@@ -36,18 +35,18 @@ public final class SpriteCalculator {
 	}
 
 	@Unmodifiable
-	public static Set<Sprite> getSprites(BlockState state, Direction face) {
+	public static Set<TextureAtlasSprite> getSprites(BlockState state, Direction face) {
 		return SPRITE_CACHES.get(face).getSprites(state);
 	}
 
 	@Unmodifiable
-	public static Set<Sprite> calculateSprites(BlockState state, Direction face, Supplier<Random> randomSupplier) {
-		List<Sprite> sprites = new ReferenceArrayList<>();
+	public static Set<TextureAtlasSprite> calculateSprites(BlockState state, Direction face, Supplier<Random> randomSupplier) {
+		List<TextureAtlasSprite> sprites = new ReferenceArrayList<>();
 		BakedModel model = MODELS.getModel(state);
 		try {
 			for (Direction cullFace : CULL_FACES) {
 				for (BakedQuad quad : model.getQuads(state, cullFace, randomSupplier.get())) {
-					if (quad.getFace() == face) {
+					if (quad.getDirection() == face) {
 						sprites.add(quad.getSprite());
 					}
 				}
@@ -55,7 +54,7 @@ public final class SpriteCalculator {
 		} catch (Exception e) {
 			//
 		}
-		return !sprites.isEmpty() ? Set.copyOf(sprites) : Set.of(model.getParticleSprite());
+		return !sprites.isEmpty() ? Set.copyOf(sprites) : Set.of(model.getParticleIcon());
 	}
 
 	public static void clearCache() {
@@ -66,9 +65,9 @@ public final class SpriteCalculator {
 
 	private static class SpriteCache {
 		private final Direction face;
-		private final Reference2ObjectOpenHashMap<BlockState, Set<Sprite>> spritesMap = new Reference2ObjectOpenHashMap<>();
+		private final Reference2ObjectOpenHashMap<BlockState, Set<TextureAtlasSprite>> spritesMap = new Reference2ObjectOpenHashMap<>();
 		private final Supplier<Random> randomSupplier = new Supplier<>() {
-			private final Random random = Random.create();
+			private final Random random = RandomSource.create();
 
 			@Override
 			public Random get() {
@@ -84,8 +83,8 @@ public final class SpriteCalculator {
 		}
 
 		@Unmodifiable
-		public Set<Sprite> getSprites(BlockState state) {
-			Set<Sprite> sprites;
+		public Set<TextureAtlasSprite> getSprites(BlockState state) {
+			Set<TextureAtlasSprite> sprites;
 
 			long optimisticReadStamp = lock.tryOptimisticRead();
 			if (optimisticReadStamp != 0L) {

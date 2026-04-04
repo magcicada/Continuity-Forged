@@ -9,10 +9,10 @@ import org.jetbrains.annotations.Nullable;
 import me.pepperbell.continuity.client.properties.BasicConnectingCtmProperties;
 import me.pepperbell.continuity.client.properties.PropertiesParsingHelper;
 import me.pepperbell.continuity.client.resource.ResourceRedirectHandler;
-import net.minecraft.block.BlockState;
-import net.minecraft.resource.ResourceManager;
-import net.minecraft.resource.ResourcePack;
-import net.minecraft.util.Identifier;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.server.packs.PackResources;
+import net.minecraft.resources.ResourceLocation;
 
 public class StandardOverlayCtmProperties extends BasicConnectingCtmProperties implements OverlayPropertiesSection.Provider {
 	protected OverlayPropertiesSection overlaySection;
@@ -21,7 +21,7 @@ public class StandardOverlayCtmProperties extends BasicConnectingCtmProperties i
 	@Nullable
 	protected Predicate<BlockState> connectBlocksPredicate;
 
-	public StandardOverlayCtmProperties(Properties properties, Identifier resourceId, ResourcePack pack, int packPriority, ResourceManager resourceManager, String method) {
+	public StandardOverlayCtmProperties(Properties properties, ResourceLocation resourceId, ResourcePack pack, int packPriority, ResourceManager resourceManager, String method) {
 		super(properties, resourceId, pack, packPriority, resourceManager, method);
 		overlaySection = new OverlayPropertiesSection(properties, resourceId, packId);
 	}

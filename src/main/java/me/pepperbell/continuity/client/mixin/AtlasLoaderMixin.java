@@ -19,32 +19,32 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import me.pepperbell.continuity.client.resource.AtlasLoaderInitContext;
 import me.pepperbell.continuity.client.resource.AtlasLoaderLoadContext;
 import me.pepperbell.continuity.client.resource.EmissiveSuffixLoader;
-import net.minecraft.client.texture.SpriteContents;
-import net.minecraft.client.texture.SpriteLoader;
-import net.minecraft.client.texture.atlas.AtlasLoader;
-import net.minecraft.client.texture.atlas.AtlasSource;
-import net.minecraft.client.texture.atlas.SingleAtlasSource;
-import net.minecraft.resource.Resource;
-import net.minecraft.resource.ResourceManager;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.renderer.texture.SpriteContents;
+import net.minecraft.client.renderer.texture.SpriteLoader;
+import net.minecraft.client.renderer.texture.atlas.SpriteSourceList;
+import net.minecraft.client.renderer.texture.atlas.SpriteSource;
+import net.minecraft.client.renderer.texture.atlas.sources.SingleFile;
+import net.minecraft.server.packs.resources.Resource;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.resources.ResourceLocation;
 
-@Mixin(AtlasLoader.class)
+@Mixin(SpriteSourceList.class)
 abstract class AtlasLoaderMixin {
 	@ModifyVariable(method = "<init>(Ljava/util/List;)V", at = @At(value = "LOAD", ordinal = 0), argsOnly = true, ordinal = 0)
-	private List<AtlasSource> continuity$modifySources(List<AtlasSource> sources) {
+	private List<SpriteSource> continuity$modifySources(List<SpriteSource> sources) {
 		AtlasLoaderInitContext context = AtlasLoaderInitContext.THREAD_LOCAL.get();
 		if (context != null) {
 			Set<Identifier> extraIds = context.getExtraIds();
 			if (extraIds != null && !extraIds.isEmpty()) {
-				List<AtlasSource> extraSources = new ObjectArrayList<>();
-				for (Identifier extraId : extraIds) {
-					extraSources.add(new SingleAtlasSource(extraId, Optional.empty()));
+				List<SpriteSource> extraSources = new ObjectArrayList<>();
+				for (ResourceLocation extraId : extraIds) {
+					extraSources.add(new SingleFile(extraId, Optional.empty()));
 				}
 
 				if (sources instanceof ArrayList) {
 					sources.addAll(0, extraSources);
 				} else {
-					List<AtlasSource> mutableSources = new ArrayList<>(extraSources);
+					List<SpriteSource> mutableSources = new ArrayList<>(extraSources);
 					mutableSources.addAll(sources);
 					return mutableSources;
 				}
@@ -54,18 +54,18 @@ abstract class AtlasLoaderMixin {
 	}
 
 	@Inject(method = "loadSources(Lnet/minecraft/resource/ResourceManager;)Ljava/util/List;", at = @At(value = "INVOKE", target = "Lcom/google/common/collect/ImmutableList;builder()Lcom/google/common/collect/ImmutableList$Builder;", remap = false), locals = LocalCapture.CAPTURE_FAILHARD)
-	private void continuity$afterLoadSources(ResourceManager resourceManager, CallbackInfoReturnable<List<Supplier<SpriteContents>>> cir, Map<Identifier, AtlasSource.SpriteRegion> suppliers) {
+	private void continuity$afterLoadSources(ResourceManager resourceManager, CallbackInfoReturnable<List<Supplier<SpriteContents>>> cir, Map<Identifier, SpriteSource.SpriteRegion> suppliers) {
 		AtlasLoaderLoadContext context = AtlasLoaderLoadContext.THREAD_LOCAL.get();
 		if (context != null) {
 			String emissiveSuffix = EmissiveSuffixLoader.getEmissiveSuffix();
 			if (emissiveSuffix != null) {
-				Map<Identifier, AtlasSource.SpriteRegion> emissiveSuppliers = new Object2ObjectOpenHashMap<>();
+				Map<Identifier, SpriteSource.SpriteRegion> emissiveSuppliers = new Object2ObjectOpenHashMap<>();
 				Map<Identifier, Identifier> emissiveIdMap = new Object2ObjectOpenHashMap<>();
 				suppliers.forEach((id, supplier) -> {
 					if (!id.getPath().endsWith(emissiveSuffix)) {
-						Identifier emissiveId = id.withPath(id.getPath() + emissiveSuffix);
+						ResourceLocation emissiveId = id.withPath(id.getPath() + emissiveSuffix);
 						if (!suppliers.containsKey(emissiveId)) {
-							Identifier emissiveLocation = emissiveId.withPath("textures/" + emissiveId.getPath() + ".png");
+							ResourceLocation emissiveLocation = emissiveId.withPath("textures/" + emissiveId.getPath() + ".png");
 							Optional<Resource> optionalResource = resourceManager.getResource(emissiveLocation);
 							if (optionalResource.isPresent()) {
 								Resource resource = optionalResource.get();

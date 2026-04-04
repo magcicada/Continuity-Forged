@@ -6,9 +6,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import me.pepperbell.continuity.client.resource.InvalidIdentifierStateHolder;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
-@Mixin(Identifier.class)
+@Mixin(ResourceLocation.class)
 abstract class IdentifierMixin {
 	@Inject(method = "isPathValid(Ljava/lang/String;)Z", at = @At("HEAD"), cancellable = true)
 	private static void continuity$onIsPathValid(CallbackInfoReturnable<Boolean> cir) {

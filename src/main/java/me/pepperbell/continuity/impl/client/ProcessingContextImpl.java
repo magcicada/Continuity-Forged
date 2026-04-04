@@ -9,10 +9,9 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import me.pepperbell.continuity.api.client.ProcessingDataKey;
 import me.pepperbell.continuity.api.client.ProcessingDataKeyRegistry;
 import me.pepperbell.continuity.api.client.QuadProcessor;
-import net.fabricmc.fabric.api.renderer.v1.RendererAccess;
-import net.fabricmc.fabric.api.renderer.v1.mesh.Mesh;
-import net.fabricmc.fabric.api.renderer.v1.mesh.MeshBuilder;
-import net.fabricmc.fabric.api.renderer.v1.mesh.QuadEmitter;
+import me.pepperbell.continuity.client.render.Mesh;
+import me.pepperbell.continuity.client.render.MeshBuilder;
+import me.pepperbell.continuity.client.render.QuadEmitter;
 
 public class ProcessingContextImpl implements QuadProcessor.ProcessingContext {
 	protected final List<Consumer<QuadEmitter>> emitterConsumers = new ObjectArrayList<>();

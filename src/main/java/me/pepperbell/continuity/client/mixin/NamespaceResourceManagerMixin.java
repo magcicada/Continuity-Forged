@@ -6,10 +6,10 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import me.pepperbell.continuity.client.resource.InvalidIdentifierStateHolder;
-import net.minecraft.resource.NamespaceResourceManager;
-import net.minecraft.util.Identifier;
+import net.minecraft.server.packs.resources.FallbackResourceManager;
+import net.minecraft.resources.ResourceLocation;
 
-@Mixin(NamespaceResourceManager.class)
+@Mixin(FallbackResourceManager.class)
 abstract class NamespaceResourceManagerMixin {
 	@Inject(method = "getMetadataPath(Lnet/minecraft/util/Identifier;)Lnet/minecraft/util/Identifier;", at = @At("HEAD"))
 	private static void continuity$onHeadGetMetadataPath(CallbackInfoReturnable<Identifier> cir) {

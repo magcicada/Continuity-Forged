@@ -3,10 +3,10 @@ package me.pepperbell.continuity.client.util.biome;
 import org.jetbrains.annotations.Nullable;
 
 import grondag.canvas.terrain.region.input.InputRegion;
-import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.BlockRenderView;
-import net.minecraft.world.biome.Biome;
+import net.minecraftforge.fml.loading.FMLPaths;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.biome.Biome;
 
 // TODO: Inline this class and always use the API once Canvas properly supports it.
 public final class BiomeRetriever {
@@ -29,12 +29,12 @@ public final class BiomeRetriever {
 	}
 
 	@Nullable
-	public static Biome getBiome(BlockRenderView blockView, BlockPos pos) {
+	public static Biome getBiome(BlockAndTintGetter blockView, BlockPos pos) {
 		return PROVIDER.getBiome(blockView, pos);
 	}
 
 	@Nullable
-	private static Biome getBiomeByAPI(BlockRenderView blockView, BlockPos pos) {
+	private static Biome getBiomeByAPI(BlockAndTintGetter blockView, BlockPos pos) {
 		if (blockView.hasBiomes()) {
 			return blockView.getBiomeFabric(pos).value();
 		}
@@ -43,7 +43,7 @@ public final class BiomeRetriever {
 
 	// Canvas
 	@Nullable
-	private static Biome getBiomeByInputRegion(BlockRenderView blockView, BlockPos pos) {
+	private static Biome getBiomeByInputRegion(BlockAndTintGetter blockView, BlockPos pos) {
 		if (blockView instanceof InputRegion inputRegion) {
 			return inputRegion.getBiome(pos);
 		}
@@ -52,6 +52,6 @@ public final class BiomeRetriever {
 
 	private interface Provider {
 		@Nullable
-		Biome getBiome(BlockRenderView blockView, BlockPos pos);
+		Biome getBiome(BlockAndTintGetter blockView, BlockPos pos);
 	}
 }

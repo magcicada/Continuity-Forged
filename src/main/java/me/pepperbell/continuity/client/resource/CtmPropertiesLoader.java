@@ -23,12 +23,12 @@ import me.pepperbell.continuity.client.ContinuityClient;
 import me.pepperbell.continuity.client.model.QuadProcessors;
 import me.pepperbell.continuity.client.util.BooleanState;
 import me.pepperbell.continuity.client.util.biome.BiomeHolderManager;
-import net.minecraft.client.texture.Sprite;
-import net.minecraft.client.util.SpriteIdentifier;
-import net.minecraft.resource.ResourceManager;
-import net.minecraft.resource.ResourcePack;
-import net.minecraft.resource.ResourceType;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.model.Material;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.server.packs.PackResources;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.resources.ResourceLocation;
 
 public class CtmPropertiesLoader {
 	private final ResourceManager resourceManager;
@@ -73,8 +73,8 @@ public class CtmPropertiesLoader {
 	}
 
 	private void loadAll(ResourcePack pack, int packPriority) {
-		for (String namespace : pack.getNamespaces(ResourceType.CLIENT_RESOURCES)) {
-			pack.findResources(ResourceType.CLIENT_RESOURCES, namespace, "optifine/ctm", (resourceId, inputSupplier) -> {
+		for (String namespace : pack.getNamespaces(PackType.CLIENT_RESOURCES)) {
+			pack.findResources(PackType.CLIENT_RESOURCES, namespace, "optifine/ctm", (resourceId, inputSupplier) -> {
 				if (resourceId.getPath().endsWith(".properties")) {
 					try (InputStream stream = inputSupplier.get()) {
 						Properties properties = new Properties();
@@ -88,7 +88,7 @@ public class CtmPropertiesLoader {
 		}
 	}
 
-	private void load(Properties properties, Identifier resourceId, ResourcePack pack, int packPriority) {
+	private void load(Properties properties, ResourceLocation resourceId, ResourcePack pack, int packPriority) {
 		String method = properties.getProperty("method", "ctm").trim();
 		CtmLoader<?> loader = CtmLoaderRegistry.get().getLoader(method);
 		if (loader != null) {
@@ -98,12 +98,12 @@ public class CtmPropertiesLoader {
 		}
 	}
 
-	private <T extends CtmProperties> void load(CtmLoader<T> loader, Properties properties, Identifier resourceId, ResourcePack pack, int packPriority, String method) {
+	private <T extends CtmProperties> void load(CtmLoader<T> loader, Properties properties, ResourceLocation resourceId, ResourcePack pack, int packPriority, String method) {
 		T ctmProperties = loader.getPropertiesFactory().createProperties(properties, resourceId, pack, packPriority, resourceManager, method);
 		if (ctmProperties != null) {
 			LoadingContainer<T> container = new LoadingContainer<>(loader, ctmProperties);
 			containers.add(container);
-			for (SpriteIdentifier spriteId : ctmProperties.getTextureDependencies()) {
+			for (Material spriteId : ctmProperties.getTextureDependencies()) {
 				Set<Identifier> atlasTextureDependencies = textureDependencies.computeIfAbsent(spriteId.getAtlasId(), id -> new ObjectOpenHashSet<>());
 				atlasTextureDependencies.add(spriteId.getTextureId());
 			}
@@ -111,7 +111,7 @@ public class CtmPropertiesLoader {
 	}
 
 	private record LoadingContainer<T extends CtmProperties>(CtmLoader<T> loader, T properties) implements Comparable<LoadingContainer<?>> {
-		public QuadProcessors.ProcessorHolder toProcessorHolder(Function<SpriteIdentifier, Sprite> textureGetter) {
+		public QuadProcessors.ProcessorHolder toProcessorHolder(Function<Material, TextureAtlasSprite> textureGetter) {
 			QuadProcessor processor = loader.getProcessorFactory().createProcessor(properties, textureGetter);
 			CachingPredicates predicates = loader.getPredicatesFactory().createPredicates(properties, textureGetter);
 			return new QuadProcessors.ProcessorHolder(processor, predicates);
@@ -132,7 +132,7 @@ public class CtmPropertiesLoader {
 			this.textureDependencies = textureDependencies;
 		}
 
-		public List<QuadProcessors.ProcessorHolder> createProcessorHolders(Function<SpriteIdentifier, Sprite> textureGetter) {
+		public List<QuadProcessors.ProcessorHolder> createProcessorHolders(Function<Material, TextureAtlasSprite> textureGetter) {
 			List<QuadProcessors.ProcessorHolder> processorHolders = new ObjectArrayList<>();
 			for (LoadingContainer<?> container : containers) {
 				processorHolders.add(container.toProcessorHolder(textureGetter));

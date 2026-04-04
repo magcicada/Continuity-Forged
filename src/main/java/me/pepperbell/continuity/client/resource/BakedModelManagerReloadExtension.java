@@ -12,12 +12,12 @@ import org.jetbrains.annotations.Nullable;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import me.pepperbell.continuity.client.mixinterface.ModelLoaderExtension;
 import me.pepperbell.continuity.client.model.QuadProcessors;
-import net.minecraft.client.render.model.ModelLoader;
-import net.minecraft.client.render.model.SpriteAtlasManager;
-import net.minecraft.client.texture.Sprite;
-import net.minecraft.client.texture.SpriteAtlasTexture;
-import net.minecraft.resource.ResourceManager;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.resources.model.ModelBakery;
+import net.minecraft.client.resources.model.AtlasSet;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.resources.ResourceLocation;
 
 public class BakedModelManagerReloadExtension {
 	private final CompletableFuture<CtmPropertiesLoader.LoadingResult> ctmLoadingResultFuture;
@@ -39,12 +39,12 @@ public class BakedModelManagerReloadExtension {
 		SpriteLoaderLoadContext.THREAD_LOCAL.set(null);
 	}
 
-	public void beforeBaking(Map<Identifier, SpriteAtlasManager.AtlasPreparation> preparations, ModelLoader modelLoader) {
+	public void beforeBaking(Map<Identifier, SpriteAtlasManager.AtlasPreparation> preparations, ModelBakery modelLoader) {
 		CtmPropertiesLoader.LoadingResult result = ctmLoadingResultFuture.join();
 
 		List<QuadProcessors.ProcessorHolder> processorHolders = result.createProcessorHolders(spriteId -> {
 			SpriteAtlasManager.AtlasPreparation preparation = preparations.get(spriteId.getAtlasId());
-			Sprite sprite = preparation.getSprite(spriteId.getTextureId());
+			TextureAtlasSprite sprite = preparation.getSprite(spriteId.getTextureId());
 			if (sprite != null) {
 				return sprite;
 			}
@@ -75,14 +75,14 @@ public class BakedModelManagerReloadExtension {
 		}
 
 		@Override
-		public CompletableFuture<@Nullable Set<Identifier>> getExtraIdsFuture(Identifier atlasId) {
+		public CompletableFuture<@Nullable Set<Identifier>> getExtraIdsFuture(ResourceLocation atlasId) {
 			return extraIdsFutures.computeIfAbsent(atlasId, id -> allExtraIdsFuture.thenApply(allExtraIds -> allExtraIds.get(id)));
 		}
 
 		@Override
 		@Nullable
-		public EmissiveControl getEmissiveControl(Identifier atlasId) {
-			if (atlasId.equals(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE)) {
+		public EmissiveControl getEmissiveControl(ResourceLocation atlasId) {
+			if (atlasId.equals(TextureAtlas.LOCATION_BLOCKS)) {
 				return blockAtlasEmissiveControl;
 			}
 			return null;

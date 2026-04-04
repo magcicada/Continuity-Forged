@@ -1,6 +1,6 @@
 package me.pepperbell.continuity.client.processor;
 
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.Direction;
 
 public enum Symmetry {
 	NONE,

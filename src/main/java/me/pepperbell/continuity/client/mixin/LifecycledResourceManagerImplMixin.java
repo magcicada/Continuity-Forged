@@ -28,14 +28,14 @@ abstract class LifecycledResourceManagerImplMixin implements MultiPackResourceMa
 		return continuity$redirectHandler;
 	}
 
-	@Inject(method = "<init>(Lnet/minecraft/resource/PackType;Ljava/util/List;)V", at = @At("TAIL"))
+	@Inject(method = "<init>(Lnet/minecraft/server/packs/PackType;Ljava/util/List;)V", at = @At("TAIL"))
 	private void continuity$onTailInit(PackType type, List<ResourcePack> packs, CallbackInfo ci) {
 		if (type == PackType.CLIENT_RESOURCES) {
 			continuity$redirectHandler = new ResourceRedirectHandler();
 		}
 	}
 
-	@ModifyVariable(method = "getResource(Lnet/minecraft/util/Identifier;)Ljava/util/Optional;", at = @At("HEAD"), argsOnly = true)
+	@ModifyVariable(method = "getResource(Lnet/minecraft/resources/ResourceLocation;)Ljava/util/Optional;", at = @At("HEAD"), argsOnly = true)
 	private ResourceLocation continuity$redirectGetResourceId(ResourceLocation id) {
 		if (continuity$redirectHandler != null) {
 			return continuity$redirectHandler.redirect(id);
@@ -43,7 +43,7 @@ abstract class LifecycledResourceManagerImplMixin implements MultiPackResourceMa
 		return id;
 	}
 
-	@ModifyVariable(method = "getAllResources(Lnet/minecraft/util/Identifier;)Ljava/util/List;", at = @At("HEAD"), argsOnly = true)
+	@ModifyVariable(method = "getAllResources(Lnet/minecraft/resources/ResourceLocation;)Ljava/util/List;", at = @At("HEAD"), argsOnly = true)
 	private ResourceLocation continuity$redirectGetAllResourcesId(ResourceLocation id) {
 		if (continuity$redirectHandler != null) {
 			return continuity$redirectHandler.redirect(id);

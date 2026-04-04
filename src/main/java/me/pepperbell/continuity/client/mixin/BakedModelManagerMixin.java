@@ -29,7 +29,7 @@ abstract class BakedModelManagerMixin {
 	@Nullable
 	private volatile BakedModelManagerReloadExtension continuity$reloadExtension;
 
-	@Inject(method = "reload(Lnet/minecraft/resource/PreparableReloadListener$Synchronizer;Lnet/minecraft/resource/ResourceManager;Lnet/minecraft/util/profiler/Profiler;Lnet/minecraft/util/profiler/Profiler;Ljava/util/concurrent/Executor;Ljava/util/concurrent/Executor;)Ljava/util/concurrent/CompletableFuture;", at = @At("HEAD"))
+	@Inject(method = "reload(Lnet/minecraft/server/packs/resources/PreparableReloadListener$Synchronizer;Lnet/minecraft/server/packs/resources/ResourceManager;Lnet/minecraft/util/profiling/ProfilerFiller;Lnet/minecraft/util/profiling/ProfilerFiller;Ljava/util/concurrent/Executor;Ljava/util/concurrent/Executor;)Ljava/util/concurrent/CompletableFuture;", at = @At("HEAD"))
 	private void continuity$onHeadReload(PreparableReloadListener.Synchronizer synchronizer, ResourceManager resourceManager, ProfilerFiller prepareProfiler, ProfilerFiller applyProfiler, Executor prepareExecutor, Executor applyExecutor, CallbackInfoReturnable<CompletableFuture<Void>> cir) {
 		continuity$reloadExtension = new BakedModelManagerReloadExtension(resourceManager, prepareExecutor);
 
@@ -39,7 +39,7 @@ abstract class BakedModelManagerMixin {
 		}
 	}
 
-	@Inject(method = "reload(Lnet/minecraft/resource/PreparableReloadListener$Synchronizer;Lnet/minecraft/resource/ResourceManager;Lnet/minecraft/util/profiler/Profiler;Lnet/minecraft/util/profiler/Profiler;Ljava/util/concurrent/Executor;Ljava/util/concurrent/Executor;)Ljava/util/concurrent/CompletableFuture;", at = @At("RETURN"))
+	@Inject(method = "reload(Lnet/minecraft/server/packs/resources/PreparableReloadListener$Synchronizer;Lnet/minecraft/server/packs/resources/ResourceManager;Lnet/minecraft/util/profiling/ProfilerFiller;Lnet/minecraft/util/profiling/ProfilerFiller;Ljava/util/concurrent/Executor;Ljava/util/concurrent/Executor;)Ljava/util/concurrent/CompletableFuture;", at = @At("RETURN"))
 	private void continuity$onReturnReload(CallbackInfoReturnable<CompletableFuture<Void>> cir) {
 		BakedModelManagerReloadExtension reloadExtension = continuity$reloadExtension;
 		if (reloadExtension != null) {
@@ -47,12 +47,12 @@ abstract class BakedModelManagerMixin {
 		}
 	}
 
-	@ModifyReturnValue(method = "reload(Lnet/minecraft/resource/PreparableReloadListener$Synchronizer;Lnet/minecraft/resource/ResourceManager;Lnet/minecraft/util/profiler/Profiler;Lnet/minecraft/util/profiler/Profiler;Ljava/util/concurrent/Executor;Ljava/util/concurrent/Executor;)Ljava/util/concurrent/CompletableFuture;", at = @At("RETURN"))
+	@ModifyReturnValue(method = "reload(Lnet/minecraft/server/packs/resources/PreparableReloadListener$Synchronizer;Lnet/minecraft/server/packs/resources/ResourceManager;Lnet/minecraft/util/profiling/ProfilerFiller;Lnet/minecraft/util/profiling/ProfilerFiller;Ljava/util/concurrent/Executor;Ljava/util/concurrent/Executor;)Ljava/util/concurrent/CompletableFuture;", at = @At("RETURN"))
 	private CompletableFuture<Void> continuity$modifyReturnReload(CompletableFuture<Void> original) {
 		return original.thenRun(() -> continuity$reloadExtension = null);
 	}
 
-	@Inject(method = "bake(Lnet/minecraft/util/profiler/Profiler;Ljava/util/Map;Lnet/minecraft/client/render/model/ModelBakery;)Lnet/minecraft/client/render/model/ModelManager$BakingResult;", at = @At("HEAD"))
+	@Inject(method = "bake(Lnet/minecraft/util/profiling/ProfilerFiller;Ljava/util/Map;Lnet/minecraft/client/resources/model/ModelBakery;)Lnet/minecraft/client/resources/model/ModelManager$BakingResult;", at = @At("HEAD"))
 	private void continuity$onHeadBake(ProfilerFiller profiler, Map<Identifier, SpriteAtlasManager.AtlasPreparation> preparations, ModelBakery modelLoader, CallbackInfoReturnable<?> cir) {
 		BakedModelManagerReloadExtension reloadExtension = continuity$reloadExtension;
 		if (reloadExtension != null) {
@@ -60,7 +60,7 @@ abstract class BakedModelManagerMixin {
 		}
 	}
 
-	@Inject(method = "upload(Lnet/minecraft/client/render/model/ModelManager$BakingResult;Lnet/minecraft/util/profiler/Profiler;)V", at = @At("RETURN"))
+	@Inject(method = "upload(Lnet/minecraft/client/resources/model/ModelManager$BakingResult;Lnet/minecraft/util/profiling/ProfilerFiller;)V", at = @At("RETURN"))
 	private void continuity$onReturnUpload(CallbackInfo ci) {
 		BakedModelManagerReloadExtension reloadExtension = continuity$reloadExtension;
 		if (reloadExtension != null) {

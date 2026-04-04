@@ -53,7 +53,7 @@ abstract class AtlasLoaderMixin {
 		return sources;
 	}
 
-	@Inject(method = "loadSources(Lnet/minecraft/resource/ResourceManager;)Ljava/util/List;", at = @At(value = "INVOKE", target = "Lcom/google/common/collect/ImmutableList;builder()Lcom/google/common/collect/ImmutableList$Builder;", remap = false), locals = LocalCapture.CAPTURE_FAILHARD)
+	@Inject(method = "loadSources(Lnet/minecraft/server/packs/resources/ResourceManager;)Ljava/util/List;", at = @At(value = "INVOKE", target = "Lcom/google/common/collect/ImmutableList;builder()Lcom/google/common/collect/ImmutableList$Builder;", remap = false), locals = LocalCapture.CAPTURE_FAILHARD)
 	private void continuity$afterLoadSources(ResourceManager resourceManager, CallbackInfoReturnable<List<Supplier<SpriteContents>>> cir, Map<Identifier, SpriteSource.SpriteRegion> suppliers) {
 		AtlasLoaderLoadContext context = AtlasLoaderLoadContext.THREAD_LOCAL.get();
 		if (context != null) {

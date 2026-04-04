@@ -7,21 +7,20 @@ import org.jetbrains.annotations.Nullable;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.util.Identifier;
-import net.minecraft.world.biome.Biome;
+import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.biome.Biome;
 
 public final class BiomeHolderManager {
-	private static final Map<Identifier, BiomeHolder> HOLDER_CACHE = new Object2ObjectOpenHashMap<>();
+	private static final Map<ResourceLocation, BiomeHolder> HOLDER_CACHE = new Object2ObjectOpenHashMap<>();
 	private static final Set<Runnable> REFRESH_CALLBACKS = new ReferenceOpenHashSet<>();
 
 	@Nullable
-	private static DynamicRegistryManager registryManager;
+	private static RegistryAccess registryManager;
 
-	public static BiomeHolder getOrCreateHolder(Identifier id) {
+	public static BiomeHolder getOrCreateHolder(ResourceLocation id) {
 		return HOLDER_CACHE.computeIfAbsent(id, BiomeHolder::new);
 	}
 
@@ -30,10 +29,10 @@ public final class BiomeHolderManager {
 	}
 
 	public static void init() {
-		ClientPlayConnectionEvents.JOIN.register(((handler, sender, client) -> {
-			registryManager = handler.getRegistryManager();
+		net.minecraftforge.common.MinecraftForge.EVENT_BUS.addListener((net.minecraftforge.client.event.ClientPlayerNetworkEvent.LoggingIn event) -> {
+			registryManager = event.getPlayer().connection.registryAccess();
 			refreshHolders();
-		}));
+		});
 	}
 
 	public static void refreshHolders() {
@@ -41,14 +40,14 @@ public final class BiomeHolderManager {
 			return;
 		}
 
-		Map<Identifier, Identifier> compactIdMap = new Object2ObjectOpenHashMap<>();
-		Registry<Biome> biomeRegistry = registryManager.get(RegistryKeys.BIOME);
-		for (Identifier id : biomeRegistry.getIds()) {
+		Map<ResourceLocation, ResourceLocation> compactIdMap = new Object2ObjectOpenHashMap<>();
+		Registry<Biome> biomeRegistry = registryManager.registryOrThrow(Registries.BIOME);
+		for (ResourceLocation id : biomeRegistry.keySet()) {
 			String path = id.getPath();
 			String compactPath = path.replace("_", "");
 			if (!path.equals(compactPath)) {
-				Identifier compactId = id.withPath(compactPath);
-				if (!biomeRegistry.containsId(compactId)) {
+				ResourceLocation compactId = id.withPath(compactPath);
+				if (!biomeRegistry.containsKey(compactId)) {
 					compactIdMap.put(compactId, id);
 				}
 			}

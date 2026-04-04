@@ -6,16 +6,16 @@ import java.util.Properties;
 import org.jetbrains.annotations.Nullable;
 
 import me.pepperbell.continuity.client.ContinuityClient;
-import net.fabricmc.fabric.api.renderer.v1.material.BlendMode;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.InvalidIdentifierException;
+import me.pepperbell.continuity.client.render.BlendMode;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.ResourceLocationException;
 
 public class OverlayPropertiesSection {
 	protected Properties properties;
-	protected Identifier resourceId;
+	protected ResourceLocation resourceId;
 	protected String packId;
 
 	protected int tintIndex = -1;
@@ -23,7 +23,7 @@ public class OverlayPropertiesSection {
 	protected BlockState tintBlock;
 	protected BlendMode layer = BlendMode.CUTOUT_MIPPED;
 
-	public OverlayPropertiesSection(Properties properties, Identifier resourceId, String packId) {
+	public OverlayPropertiesSection(Properties properties, ResourceLocation resourceId, String packId) {
 		this.properties = properties;
 		this.resourceId = resourceId;
 		this.packId = packId;
@@ -61,20 +61,20 @@ public class OverlayPropertiesSection {
 
 		String[] parts = tintBlockStr.trim().split(":", 3);
 		if (parts.length != 0) {
-			Identifier blockId;
+			ResourceLocation blockId;
 			try {
 				if (parts.length == 1 || parts[1].contains("=")) {
-					blockId = new Identifier(parts[0]);
+					blockId = new ResourceLocation(parts[0]);
 				} else {
-					blockId = new Identifier(parts[0], parts[1]);
+					blockId = new ResourceLocation(parts[0], parts[1]);
 				}
-			} catch (InvalidIdentifierException e) {
+			} catch (ResourceLocationException e) {
 				ContinuityClient.LOGGER.warn("Invalid 'tintBlock' value '" + tintBlockStr + "' in file '" + resourceId + "' in pack '" + packId + "'", e);
 				return;
 			}
 
-			if (Registries.BLOCK.containsId(blockId)) {
-				Block block = Registries.BLOCK.get(blockId);
+			if (BuiltInRegistries.BLOCK.containsKey(blockId)) {
+				Block block = BuiltInRegistries.BLOCK.get(blockId);
 				tintBlock = block.getDefaultState();
 			} else {
 				ContinuityClient.LOGGER.warn("Unknown block '" + blockId + "' in 'tintBlock' value '" + tintBlockStr + "' in file '" + resourceId + "' in pack '" + packId + "'");

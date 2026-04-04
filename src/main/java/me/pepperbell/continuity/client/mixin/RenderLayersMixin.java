@@ -7,28 +7,28 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import me.pepperbell.continuity.client.config.ContinuityConfig;
 import me.pepperbell.continuity.client.resource.CustomBlockLayers;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.RenderLayers;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
 
-@Mixin(RenderLayers.class)
+@Mixin(ItemBlockRenderTypes.class)
 abstract class RenderLayersMixin {
-	@Inject(method = "getBlockLayer(Lnet/minecraft/block/BlockState;)Lnet/minecraft/client/render/RenderLayer;", at = @At("HEAD"), cancellable = true)
-	private static void continuity$onHeadGetBlockLayer(BlockState state, CallbackInfoReturnable<RenderLayer> cir) {
+	@Inject(method = "getChunkRenderType(Lnet/minecraft/world/level/block/state/BlockState;)Lnet/minecraft/client/renderer/RenderType;", at = @At("HEAD"), cancellable = true)
+	private static void continuity$onHeadGetBlockLayer(BlockState state, CallbackInfoReturnable<RenderType> cir) {
 		if (!CustomBlockLayers.isEmpty() && ContinuityConfig.INSTANCE.customBlockLayers.get()) {
-			RenderLayer layer = CustomBlockLayers.getLayer(state);
+			RenderType layer = CustomBlockLayers.getLayer(state);
 			if (layer != null) {
 				cir.setReturnValue(layer);
 			}
 		}
 	}
 
-	@Inject(method = "getMovingBlockLayer(Lnet/minecraft/block/BlockState;)Lnet/minecraft/client/render/RenderLayer;", at = @At("HEAD"), cancellable = true)
-	private static void continuity$onHeadGetMovingBlockLayer(BlockState state, CallbackInfoReturnable<RenderLayer> cir) {
+	@Inject(method = "getMovingBlockRenderType(Lnet/minecraft/world/level/block/state/BlockState;)Lnet/minecraft/client/renderer/RenderType;", at = @At("HEAD"), cancellable = true)
+	private static void continuity$onHeadGetMovingBlockLayer(BlockState state, CallbackInfoReturnable<RenderType> cir) {
 		if (!CustomBlockLayers.isEmpty() && ContinuityConfig.INSTANCE.customBlockLayers.get()) {
-			RenderLayer layer = CustomBlockLayers.getLayer(state);
+			RenderType layer = CustomBlockLayers.getLayer(state);
 			if (layer != null) {
-				cir.setReturnValue(layer == RenderLayer.getTranslucent() ? RenderLayer.getTranslucentMovingBlock() : layer);
+				cir.setReturnValue(layer == RenderType.translucent() ? RenderType.getTranslucentMovingBlock() : layer);
 			}
 		}
 	}

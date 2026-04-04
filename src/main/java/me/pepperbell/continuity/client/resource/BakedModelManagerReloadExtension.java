@@ -12,12 +12,12 @@ import org.jetbrains.annotations.Nullable;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import me.pepperbell.continuity.client.mixinterface.ModelLoaderExtension;
 import me.pepperbell.continuity.client.model.QuadProcessors;
-import net.minecraft.client.render.model.ModelLoader;
-import net.minecraft.client.render.model.SpriteAtlasManager;
-import net.minecraft.client.texture.Sprite;
-import net.minecraft.client.texture.SpriteAtlasTexture;
-import net.minecraft.resource.ResourceManager;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.resources.model.ModelBakery;
+import net.minecraft.client.resources.model.AtlasSet;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.resources.ResourceLocation;
 
 public class BakedModelManagerReloadExtension {
 	private final CompletableFuture<CtmPropertiesLoader.LoadingResult> ctmLoadingResultFuture;
@@ -39,12 +39,12 @@ public class BakedModelManagerReloadExtension {
 		SpriteLoaderLoadContext.THREAD_LOCAL.set(null);
 	}
 
-	public void beforeBaking(Map<Identifier, SpriteAtlasManager.AtlasPreparation> preparations, ModelLoader modelLoader) {
+	public void beforeBaking(Map<ResourceLocation, AtlasSet.StitchResult> preparations, ModelBakery modelLoader) {
 		CtmPropertiesLoader.LoadingResult result = ctmLoadingResultFuture.join();
 
 		List<QuadProcessors.ProcessorHolder> processorHolders = result.createProcessorHolders(spriteId -> {
-			SpriteAtlasManager.AtlasPreparation preparation = preparations.get(spriteId.getAtlasId());
-			Sprite sprite = preparation.getSprite(spriteId.getTextureId());
+			AtlasSet.StitchResult preparation = preparations.get(spriteId.atlasLocation());
+			TextureAtlasSprite sprite = preparation.getSprite(spriteId.texture());
 			if (sprite != null) {
 				return sprite;
 			}
@@ -65,24 +65,24 @@ public class BakedModelManagerReloadExtension {
 	}
 
 	private static class SpriteLoaderLoadContextImpl implements SpriteLoaderLoadContext {
-		private final CompletableFuture<Map<Identifier, Set<Identifier>>> allExtraIdsFuture;
-		private final Map<Identifier, CompletableFuture<Set<Identifier>>> extraIdsFutures = new Object2ObjectOpenHashMap<>();
+		private final CompletableFuture<Map<ResourceLocation, Set<ResourceLocation>>> allExtraIdsFuture;
+		private final Map<ResourceLocation, CompletableFuture<Set<ResourceLocation>>> extraIdsFutures = new Object2ObjectOpenHashMap<>();
 		private final EmissiveControl blockAtlasEmissiveControl;
 
-		public SpriteLoaderLoadContextImpl(CompletableFuture<Map<Identifier, Set<Identifier>>> allExtraIdsFuture, AtomicBoolean blockAtlasHasEmissivesHolder) {
+		public SpriteLoaderLoadContextImpl(CompletableFuture<Map<ResourceLocation, Set<ResourceLocation>>> allExtraIdsFuture, AtomicBoolean blockAtlasHasEmissivesHolder) {
 			this.allExtraIdsFuture = allExtraIdsFuture;
 			blockAtlasEmissiveControl = new EmissiveControlImpl(blockAtlasHasEmissivesHolder);
 		}
 
 		@Override
-		public CompletableFuture<@Nullable Set<Identifier>> getExtraIdsFuture(Identifier atlasId) {
+		public CompletableFuture<@Nullable Set<ResourceLocation>> getExtraIdsFuture(ResourceLocation atlasId) {
 			return extraIdsFutures.computeIfAbsent(atlasId, id -> allExtraIdsFuture.thenApply(allExtraIds -> allExtraIds.get(id)));
 		}
 
 		@Override
 		@Nullable
-		public EmissiveControl getEmissiveControl(Identifier atlasId) {
-			if (atlasId.equals(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE)) {
+		public EmissiveControl getEmissiveControl(ResourceLocation atlasId) {
+			if (atlasId.equals(TextureAtlas.LOCATION_BLOCKS)) {
 				return blockAtlasEmissiveControl;
 			}
 			return null;
@@ -90,7 +90,7 @@ public class BakedModelManagerReloadExtension {
 
 		private static class EmissiveControlImpl implements EmissiveControl {
 			@Nullable
-			private volatile Map<Identifier, Identifier> emissiveIdMap;
+			private volatile Map<ResourceLocation, ResourceLocation> emissiveIdMap;
 			private final AtomicBoolean hasEmissivesHolder;
 
 			public EmissiveControlImpl(AtomicBoolean hasEmissivesHolder) {
@@ -99,12 +99,12 @@ public class BakedModelManagerReloadExtension {
 
 			@Override
 			@Nullable
-			public Map<Identifier, Identifier> getEmissiveIdMap() {
+			public Map<ResourceLocation, ResourceLocation> getEmissiveIdMap() {
 				return emissiveIdMap;
 			}
 
 			@Override
-			public void setEmissiveIdMap(Map<Identifier, Identifier> emissiveIdMap) {
+			public void setEmissiveIdMap(Map<ResourceLocation, ResourceLocation> emissiveIdMap) {
 				this.emissiveIdMap = emissiveIdMap;
 			}
 

@@ -8,7 +8,7 @@ import me.pepperbell.continuity.api.client.ProcessingDataKeyRegistry;
 import me.pepperbell.continuity.client.ContinuityClient;
 import me.pepperbell.continuity.client.processor.overlay.SimpleOverlayQuadProcessor;
 import me.pepperbell.continuity.client.processor.overlay.StandardOverlayQuadProcessor;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
 
 public final class ProcessingDataKeys {
 	public static final ProcessingDataKey<BlockPos.Mutable> MUTABLE_POS = create("mutable_pos", BlockPos.Mutable::new);

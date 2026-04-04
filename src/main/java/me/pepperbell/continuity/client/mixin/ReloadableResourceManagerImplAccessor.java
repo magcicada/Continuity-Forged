@@ -3,11 +3,11 @@ package me.pepperbell.continuity.client.mixin;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
-import net.minecraft.resource.LifecycledResourceManager;
-import net.minecraft.resource.ReloadableResourceManagerImpl;
+import net.minecraft.server.packs.resources.CloseableResourceManager;
+import net.minecraft.server.packs.resources.ReloadableResourceManager;
 
-@Mixin(ReloadableResourceManagerImpl.class)
+@Mixin(ReloadableResourceManager.class)
 public interface ReloadableResourceManagerImplAccessor {
 	@Accessor("activeManager")
-	LifecycledResourceManager getActiveManager();
+	CloseableResourceManager getActiveManager();
 }

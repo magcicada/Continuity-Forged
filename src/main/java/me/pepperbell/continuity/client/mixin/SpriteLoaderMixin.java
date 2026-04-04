@@ -22,22 +22,22 @@ import me.pepperbell.continuity.client.resource.AtlasLoaderInitContext;
 import me.pepperbell.continuity.client.resource.AtlasLoaderLoadContext;
 import me.pepperbell.continuity.client.resource.SpriteLoaderLoadContext;
 import me.pepperbell.continuity.client.resource.SpriteLoaderStitchContext;
-import net.minecraft.client.texture.Sprite;
-import net.minecraft.client.texture.SpriteContents;
-import net.minecraft.client.texture.SpriteLoader;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.texture.SpriteContents;
+import net.minecraft.client.renderer.texture.SpriteLoader;
+import net.minecraft.resources.ResourceLocation;
 
 @Mixin(SpriteLoader.class)
 abstract class SpriteLoaderMixin {
 	@Shadow
 	@Final
-	private Identifier id;
+	private ResourceLocation id;
 
-	@ModifyArg(method = "load(Lnet/minecraft/resource/ResourceManager;Lnet/minecraft/util/Identifier;ILjava/util/concurrent/Executor;)Ljava/util/concurrent/CompletableFuture;", at = @At(value = "INVOKE", target = "Ljava/util/concurrent/CompletableFuture;supplyAsync(Ljava/util/function/Supplier;Ljava/util/concurrent/Executor;)Ljava/util/concurrent/CompletableFuture;", ordinal = 0), index = 0)
+	@ModifyArg(method = "load(Lnet/minecraft/server/packs/resources/ResourceManager;Lnet/minecraft/resources/ResourceLocation;ILjava/util/concurrent/Executor;)Ljava/util/concurrent/CompletableFuture;", at = @At(value = "INVOKE", target = "Ljava/util/concurrent/CompletableFuture;supplyAsync(Ljava/util/function/Supplier;Ljava/util/concurrent/Executor;)Ljava/util/concurrent/CompletableFuture;", ordinal = 0), index = 0)
 	private Supplier<List<Supplier<SpriteContents>>> continuity$modifySupplier(Supplier<List<Supplier<SpriteContents>>> supplier) {
 		SpriteLoaderLoadContext context = SpriteLoaderLoadContext.THREAD_LOCAL.get();
 		if (context != null) {
-			CompletableFuture<@Nullable Set<Identifier>> extraIdsFuture = context.getExtraIdsFuture(id);
+			CompletableFuture<@Nullable Set<ResourceLocation>> extraIdsFuture = context.getExtraIdsFuture(id);
 			SpriteLoaderLoadContext.EmissiveControl emissiveControl = context.getEmissiveControl(id);
 			if (emissiveControl != null) {
 				return () -> {
@@ -59,18 +59,18 @@ abstract class SpriteLoaderMixin {
 		return supplier;
 	}
 
-	@ModifyArg(method = "load(Lnet/minecraft/resource/ResourceManager;Lnet/minecraft/util/Identifier;ILjava/util/concurrent/Executor;)Ljava/util/concurrent/CompletableFuture;", at = @At(value = "INVOKE", target = "Ljava/util/concurrent/CompletableFuture;thenApply(Ljava/util/function/Function;)Ljava/util/concurrent/CompletableFuture;", ordinal = 0), index = 0)
+	@ModifyArg(method = "load(Lnet/minecraft/server/packs/resources/ResourceManager;Lnet/minecraft/resources/ResourceLocation;ILjava/util/concurrent/Executor;)Ljava/util/concurrent/CompletableFuture;", at = @At(value = "INVOKE", target = "Ljava/util/concurrent/CompletableFuture;thenApply(Ljava/util/function/Function;)Ljava/util/concurrent/CompletableFuture;", ordinal = 0), index = 0)
 	private Function<List<SpriteContents>, SpriteLoader.StitchResult> continuity$modifyFunction(Function<List<SpriteContents>, SpriteLoader.StitchResult> function) {
 		SpriteLoaderLoadContext context = SpriteLoaderLoadContext.THREAD_LOCAL.get();
 		if (context != null) {
 			SpriteLoaderLoadContext.EmissiveControl emissiveControl = context.getEmissiveControl(id);
 			if (emissiveControl != null) {
 				return spriteContentsList -> {
-					Map<Identifier, Identifier> emissiveIdMap = emissiveControl.getEmissiveIdMap();
+					Map<ResourceLocation, ResourceLocation> emissiveIdMap = emissiveControl.getEmissiveIdMap();
 					if (emissiveIdMap != null) {
 						SpriteLoaderStitchContext.THREAD_LOCAL.set(new SpriteLoaderStitchContext() {
 							@Override
-							public Map<Identifier, Identifier> getEmissiveIdMap() {
+							public Map<ResourceLocation, ResourceLocation> getEmissiveIdMap() {
 								return emissiveIdMap;
 							}
 
@@ -90,16 +90,16 @@ abstract class SpriteLoaderMixin {
 		return function;
 	}
 
-	@Inject(method = "stitch(Ljava/util/List;ILjava/util/concurrent/Executor;)Lnet/minecraft/client/texture/SpriteLoader$StitchResult;", at = @At("RETURN"))
+	@Inject(method = "stitch(Ljava/util/List;ILjava/util/concurrent/Executor;)Lnet/minecraft/client/renderer/texture/SpriteLoader$StitchResult;", at = @At("RETURN"))
 	private void continuity$onReturnStitch(List<SpriteContents> spriteContentsList, int mipmapLevels, Executor executor, CallbackInfoReturnable<SpriteLoader.StitchResult> cir) {
 		SpriteLoaderStitchContext context = SpriteLoaderStitchContext.THREAD_LOCAL.get();
 		if (context != null) {
-			Map<Identifier, Identifier> emissiveIdMap = context.getEmissiveIdMap();
-			Map<Identifier, Sprite> sprites = cir.getReturnValue().regions();
+			Map<ResourceLocation, ResourceLocation> emissiveIdMap = context.getEmissiveIdMap();
+			Map<ResourceLocation, TextureAtlasSprite> sprites = cir.getReturnValue().regions();
 			emissiveIdMap.forEach((id, emissiveId) -> {
-				Sprite sprite = sprites.get(id);
+				TextureAtlasSprite sprite = sprites.get(id);
 				if (sprite != null) {
-					Sprite emissiveSprite = sprites.get(emissiveId);
+					TextureAtlasSprite emissiveSprite = sprites.get(emissiveId);
 					if (emissiveSprite != null) {
 						((SpriteExtension) sprite).continuity$setEmissiveSprite(emissiveSprite);
 						context.markHasEmissives();

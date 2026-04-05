@@ -22,6 +22,7 @@ public final class QuadUtil {
 					newMinV + (quad.v(i) - oldMinV) * vFactor
 			);
 		}
+		quad.sprite(newSprite);
 	}
 
 	public static void assignLerpedUvs(MutableQuadView quad, TextureAtlasSprite sprite) {
@@ -43,6 +44,7 @@ public final class QuadUtil {
 		emitter.color(color, color, color, color);
 		assignLerpedUvs(emitter, sprite);
 		emitter.material(material);
+		emitter.sprite(sprite);
 		emitter.emit();
 	}
 

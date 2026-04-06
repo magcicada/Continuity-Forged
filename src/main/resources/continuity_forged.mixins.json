@@ -1,0 +1,25 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "net.imjeck.client.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "continuity_forged.mixins.refmap.json",
+  "client": [
+    "AtlasLoaderMixin",
+    "BakedModelManagerMixin",
+    "FallingBlockEntityRendererMixin",
+    "IdentifierMixin",
+    "LifecycledResourceManagerImplMixin",
+    "ModelBlockRendererMixin",
+    "ModelLoaderMixin",
+    "NamespaceResourceManagerMixin",
+    "PistonBlockEntityRendererMixin",
+    "ReloadableResourceManagerImplAccessor",
+    "RenderLayersMixin",
+    "SpriteLoaderMixin",
+    "SpriteMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

@@ -3,22 +3,22 @@ loaderVersion="[47,)"
 license="LGPL-3.0-only"
 
 [[mods]]
-modId="continuity"
-version="${file.jarVersion}"
+modId="continuity_forged"
+version="${version}"
 displayName="Continuity"
-logoFile="assets/continuity/icon.png"
+logoFile="assets/continuity_forged/icon.png"
 description='''
 Continuity is a Minecraft mod that allows resource packs that use the OptiFine connected textures format, OptiFine emissive textures format (only for blocks and item models), or OptiFine custom block layers format to work without OptiFine.
 '''
 
-[[dependencies.continuity]]
+[[dependencies.continuity_forged]]
 modId="forge"
 mandatory=true
 versionRange="[47.3.0,)"
 ordering="NONE"
 side="CLIENT"
 
-[[dependencies.continuity]]
+[[dependencies.continuity_forged]]
 modId="minecraft"
 mandatory=true
 versionRange="[1.20.1]"

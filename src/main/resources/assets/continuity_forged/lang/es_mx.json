@@ -1,0 +1,9 @@
+{
+  "options.continuity_forged.title": "Configuración de Continuity",
+  "options.continuity_forged.connected_textures": "Texturas Conectadas",
+  "options.continuity_forged.connected_textures.tooltip": "Activar o desactivar texturas conectadas para bloques.",
+  "options.continuity_forged.emissive_textures": "Texturas Emisivas",
+  "options.continuity_forged.emissive_textures.tooltip": "Activar o desactivar texturas emisivas para modelos de bloques e ítems.",
+  "options.continuity_forged.custom_block_layers": "Capas de Bloques Personalizadas",
+  "options.continuity_forged.custom_block_layers.tooltip": "Activar o desactivar capas de bloques personalizadas."
+}

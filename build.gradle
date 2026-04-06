@@ -1,6 +1,7 @@
 plugins {
 	id 'net.minecraftforge.gradle' version '[6.0.16,6.2)'
 	id 'maven-publish'
+	id 'org.spongepowered.mixin' version '0.7.38'
 }
 
 version = project.mod_version
@@ -27,7 +28,7 @@ minecraft {
 			property 'mixin.env.refMapRemappingFile', "${project.buildDir}/createSrgToMcp/output.srg"
 
 			mods {
-				continuity {
+				continuity_forged {
 					source sourceSets.main
 				}
 			}
@@ -39,6 +40,17 @@ dependencies {
 	minecraft "net.minecraftforge:forge:${project.forge_version}"
 
 	annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+	compileOnly files("F:/Game/Minecraft/Mymodpack/libraries/io/github/llamalad7/mixinextras-common/0.4.1/mixinextras-common-0.4.1.jar")
+	annotationProcessor files("F:/Game/Minecraft/Mymodpack/libraries/io/github/llamalad7/mixinextras-common/0.4.1/mixinextras-common-0.4.1.jar")
+}
+
+tasks.withType(JavaCompile).configureEach {
+	dependsOn 'createSrgToMcp'
+}
+
+mixin {
+	add sourceSets.main, 'continuity_forged.mixins.refmap.json'
+	config 'continuity_forged.mixins.json'
 }
 
 processResources {
@@ -56,14 +68,14 @@ jar {
 
 	manifest {
 		attributes([
-				"Specification-Title"     : "continuity",
+				"Specification-Title"     : "continuity_forged",
 				"Specification-Vendor"    : "PepperBell",
 				"Specification-Version"   : "1",
 				"Implementation-Title"    : project.name,
 				"Implementation-Vendor"   : "PepperBell",
 				"Implementation-Version"  : project.jar.archiveVersion,
 				"Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-				"MixinConfigs"            : "continuity.mixins.json"
+				"MixinConfigs"            : "continuity_forged.mixins.json"
 		])
 	}
 }

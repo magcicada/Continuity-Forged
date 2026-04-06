@@ -1,0 +1,9 @@
+{
+  "options.continuity_forged.title": "Paramètres de Continuity",
+  "options.continuity_forged.connected_textures": "Textures Connectées",
+  "options.continuity_forged.connected_textures.tooltip": "Active ou désactive les textures connectées des blocs.",
+  "options.continuity_forged.emissive_textures": "Textures Émissives",
+  "options.continuity_forged.emissive_textures.tooltip": "Active ou désactive les textures émissives des modèles de blocs et d'objets.",
+  "options.continuity_forged.custom_block_layers": "Couches Personnalisées",
+  "options.continuity_forged.custom_block_layers.tooltip": "Active ou désactive les couches de blocs personnalisées"
+}

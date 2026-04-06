@@ -1,0 +1,13 @@
+{
+  "options.continuity_forged.title": "Continuity配置",
+  "options.continuity_forged.connected_textures": "连接纹理",
+  "options.continuity_forged.connected_textures.tooltip": "启用或禁用方块的连接纹理。",
+  "options.continuity_forged.emissive_textures": "自发光纹理",
+  "options.continuity_forged.emissive_textures.tooltip": "启用或禁用方块和物品模型的自发光纹理。",
+  "options.continuity_forged.custom_block_layers": "自定义方块层",
+  "options.continuity_forged.custom_block_layers.tooltip": "启用或禁用自定义方块层。",
+  "resourcePack.continuity_forged.default.name": "默认连接纹理",
+  "resourcePack.continuity_forged.default.description": "玻璃、砂岩、书架",
+  "resourcePack.continuity_forged.glass_pane_culling_fix.name": "玻璃板剔除修复",
+  "resourcePack.continuity_forged.glass_pane_culling_fix.description": "剔除玻璃板之间的面"
+}

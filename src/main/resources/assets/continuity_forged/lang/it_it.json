@@ -1,0 +1,7 @@
+{
+  "options.continuity_forged.title": "Configurazione di Continuity",
+  "options.continuity_forged.disable_ctm": "Disattiva CTM",
+  "options.continuity_forged.disable_ctm.tooltip": "Disattiva completamente le texture connesse.",
+  "options.continuity_forged.use_manual_culling": "Usa Culling Manuale",
+  "options.continuity_forged.use_manual_culling.tooltip": "Migliora esponenzialmente le performance applicando solo CTM ai quad visibili, ma potrebbe causare problemi con alcune mod."
+}

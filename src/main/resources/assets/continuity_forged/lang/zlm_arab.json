@@ -1,0 +1,9 @@
+{
+  "options.continuity_forged.title": "کونفيݢوراسي Continuity",
+  "options.continuity_forged.connected_textures": "تيکستور برسامبوڠ",
+  "options.continuity_forged.connected_textures.tooltip": "داياکن اتاو ڽهداياکن تيکستور يڠ برسامبوڠ اونتوق بلوک.",
+  "options.continuity_forged.emissive_textures": "تيکستور ايميسيف",
+  "options.continuity_forged.emissive_textures.tooltip": "داياکن اتاو ڽهدايکن تيکستور ايميسيف اونتوق موديل بلوک دان اٴيتم.",
+  "options.continuity_forged.custom_block_layers": "لاڤيسن بلوک ترسواي",
+  "options.continuity_forged.custom_block_layers.tooltip": "داياکن اتاو ڽهداياکن لاڤيسن بلوک ترسواي."
+}

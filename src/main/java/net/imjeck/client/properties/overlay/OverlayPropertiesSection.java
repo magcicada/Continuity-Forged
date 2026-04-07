@@ -87,6 +87,10 @@ public class OverlayPropertiesSection {
 	protected void parseLayer() {
 		String layerStr = properties.getProperty("layer");
 		if (layerStr == null) {
+			// OptiFine uses "renderPass" as an alias
+			layerStr = properties.getProperty("renderPass");
+		}
+		if (layerStr == null) {
 			return;
 		}
 

@@ -33,6 +33,10 @@ public class RandomCtmProperties extends BaseCtmProperties {
 	protected void parseWeights() {
 		String weightsStr = properties.getProperty("weights");
 		if (weightsStr == null) {
+			// OptiFine uses "weight" (singular) as an alias
+			weightsStr = properties.getProperty("weight");
+		}
+		if (weightsStr == null) {
 			return;
 		}
 

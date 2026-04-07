@@ -85,6 +85,14 @@ public class BasicConnectingCtmProperties extends BaseCtmProperties {
 			public boolean shouldConnect(BlockAndTintGetter blockView, BlockState appearanceState, BlockState state, BlockPos pos, BlockState otherAppearanceState, BlockState otherState, BlockPos otherPos, Direction face, TextureAtlasSprite quadSprite) {
 				return appearanceState == otherAppearanceState;
 			}
+		},
+		MATERIAL {
+			@Override
+			public boolean shouldConnect(BlockAndTintGetter blockView, BlockState appearanceState, BlockState state, BlockPos pos, BlockState otherAppearanceState, BlockState otherState, BlockPos otherPos, Direction face, TextureAtlasSprite quadSprite) {
+				// In 1.20+, Material was removed. Use MapColor as the closest equivalent
+				// for material-based connection matching (same visual material category).
+				return appearanceState.getMapColor(blockView, pos) == otherAppearanceState.getMapColor(blockView, otherPos);
+			}
 		};
 	}
 }

@@ -14,6 +14,7 @@ import net.imjeck.client.util.RenderUtil;
 import net.imjeck.impl.client.ProcessingContextImpl;
 import net.imjeck.client.render.MutableQuadView;
 import net.imjeck.client.render.ForwardingBakedModel;
+import net.imjeck.client.render.QuadEmitter;
 import net.imjeck.client.render.RenderContext;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.world.level.block.state.BlockState;
@@ -23,6 +24,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraftforge.client.ChunkRenderTypeSet;
 import net.minecraftforge.client.model.data.ModelData;
 import net.minecraftforge.client.model.data.ModelProperty;
 
@@ -35,6 +37,11 @@ public static final ModelProperty<BlockPos> BLOCK_POS_PROPERTY = new ModelProper
 /** Thread-local context set by ModelBlockRendererMixin for Embeddium compatibility. */
 public static final ThreadLocal<BlockAndTintGetter> THREAD_LOCAL_LEVEL = new ThreadLocal<>();
 public static final ThreadLocal<BlockPos> THREAD_LOCAL_POS = new ThreadLocal<>();
+public static final ThreadLocal<RenderType> THREAD_LOCAL_RENDER_TYPE = new ThreadLocal<>();
+
+/** Extra render types added so overlay quads (e.g. cutoutMipped overlays on solid blocks) can be emitted correctly. */
+private static final ChunkRenderTypeSet OVERLAY_EXTRA_RENDER_TYPES =
+		ChunkRenderTypeSet.of(RenderType.cutoutMipped(), RenderType.cutout(), RenderType.translucent());
 
 protected final BlockState defaultState;
 protected volatile Function<TextureAtlasSprite, QuadProcessors.Slice> defaultSliceFunc;
@@ -42,6 +49,14 @@ protected volatile Function<TextureAtlasSprite, QuadProcessors.Slice> defaultSli
 public CtmBakedModel(BakedModel wrapped, BlockState defaultState) {
 this.wrapped = wrapped;
 this.defaultState = defaultState;
+}
+
+@Override
+public ChunkRenderTypeSet getRenderTypes(BlockState state, RandomSource rand, ModelData data) {
+	if (!ContinuityConfig.INSTANCE.connectedTextures.get()) {
+		return wrapped.getRenderTypes(state, rand, data);
+	}
+	return ChunkRenderTypeSet.union(wrapped.getRenderTypes(state, rand, data), OVERLAY_EXTRA_RENDER_TYPES);
 }
 
 @Override
@@ -82,23 +97,71 @@ BlockState appearanceState = state.getAppearance(blockView, pos, Direction.DOWN,
 RenderContext context = new RenderContext();
 quadTransform.prepare(blockView, appearanceState, state, pos, rand.nextLong(), context, ContinuityConfig.INSTANCE.useManualCulling.get(), getSliceFunc(appearanceState));
 
+// Determine if this render type belongs to the wrapped model (base geometry pass).
+// For non-native types (e.g. cutoutMipped on a solid block), we still process base quads
+// to trigger overlay generation but discard them from the final result.
+boolean isNativeRenderType = renderType == null || wrapped.getRenderTypes(state, rand, data).contains(renderType);
+
+THREAD_LOCAL_RENDER_TYPE.set(renderType);
+try {
 context.pushTransform(quadTransform);
 List<BakedQuad> baseQuads = wrapped.getQuads(state, side, rand, data, renderType);
 List<BakedQuad> result = context.processQuads(baseQuads, side);
 context.popTransform();
 
-// Output extra quads from processing context
-quadTransform.processingContext.outputTo(context.getEmitter());
-List<BakedQuad> extraOutput = context.getEmitter().getOutput();
-if (!extraOutput.isEmpty()) {
+// Separate overlay quads (from emitterConsumers) and mesh quads (from compact CTM splits).
+QuadEmitter emitter = context.getEmitter();
+
+// 1. Collect overlay quads
+quadTransform.processingContext.outputOverlaysTo(emitter);
+List<BakedQuad> overlayQuads = new ArrayList<>(emitter.getOutput());
+emitter.clearOutput();
+
+// 2. Collect mesh quads (extra quads from compact CTM quad splitting etc.)
+quadTransform.processingContext.outputMeshesTo(emitter);
+List<BakedQuad> meshQuads = new ArrayList<>(emitter.getOutput());
+emitter.clearOutput();
+
+if (!isNativeRenderType) {
+// Non-native render type: only return overlay quads (base geometry is in the native pass).
+quadTransform.reset();
+return overlayQuads.isEmpty() ? List.of() : overlayQuads;
+}
+
+// 3. Re-process mesh quads through the transform pipeline so multipass processors
+//    (e.g. random) can apply to compact CTM sub-quads.
+if (!meshQuads.isEmpty()) {
+quadTransform.processingContext.reset();
+quadTransform.processingContext.prepare();
+
+context.pushTransform(quadTransform);
+meshQuads = context.processQuads(meshQuads, side);
+context.popTransform();
+
+// Collect any overlay quads generated during reprocessing
+quadTransform.processingContext.outputOverlaysTo(emitter);
+overlayQuads.addAll(emitter.getOutput());
+emitter.clearOutput();
+
+// Collect any further mesh quads (rare but handle gracefully)
+quadTransform.processingContext.outputMeshesTo(emitter);
+meshQuads.addAll(emitter.getOutput());
+emitter.clearOutput();
+}
+
+// 4. Combine all quads
+if (!meshQuads.isEmpty() || !overlayQuads.isEmpty()) {
 result = new ArrayList<>(result);
-result.addAll(extraOutput);
-context.getEmitter().clearOutput();
+result.addAll(meshQuads);
+result.addAll(overlayQuads);
 }
 
 quadTransform.reset();
 
 return result;
+} finally {
+THREAD_LOCAL_RENDER_TYPE.remove();
+}
 }
 
 protected Function<TextureAtlasSprite, QuadProcessors.Slice> getSliceFunc(BlockState state) {

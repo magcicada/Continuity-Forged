@@ -163,7 +163,7 @@ public class CompactCtmQuadProcessor extends AbstractQuadProcessor {
 
 			if (!(split01 | split12 | split23 | split30)) {
 				tryInterpolate(quad, sprite, spriteIndex0);
-				return ProcessingResult.STOP;
+				return ProcessingResult.NEXT_PASS;
 			}
 
 			VertexContainer vertexContainer = context.getData(ProcessingDataKeys.VERTEX_CONTAINER);
@@ -383,7 +383,7 @@ public class CompactCtmQuadProcessor extends AbstractQuadProcessor {
 
 			if (spriteIndexA == spriteIndexB) {
 				tryInterpolate(quad, sprite, spriteIndexA);
-				return ProcessingResult.STOP;
+				return ProcessingResult.NEXT_PASS;
 			}
 
 			if (swapAB) {
@@ -476,7 +476,7 @@ public class CompactCtmQuadProcessor extends AbstractQuadProcessor {
 				int spriteIndex = getSpriteIndex(quadrantIndexMap[quadrant], connections);
 				tryInterpolate(quad, sprite, spriteIndex);
 			}
-			return ProcessingResult.STOP;
+			return ProcessingResult.NEXT_PASS;
 		}
 	}
 

@@ -11,6 +11,7 @@ import org.jetbrains.annotations.Nullable;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.imjeck.api.client.ProcessingDataProvider;
 import net.imjeck.api.client.QuadProcessor;
+import net.imjeck.client.model.CtmBakedModel;
 import net.imjeck.client.processor.AbstractQuadProcessor;
 import net.imjeck.client.processor.AbstractQuadProcessorFactory;
 import net.imjeck.client.processor.ConnectionPredicate;
@@ -27,6 +28,7 @@ import net.imjeck.client.render.BlendMode;
 import net.imjeck.client.render.RenderMaterial;
 import net.imjeck.client.render.MutableQuadView;
 import net.imjeck.client.render.QuadEmitter;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.resources.ResourceLocation;
@@ -75,6 +77,11 @@ public class StandardOverlayQuadProcessor extends AbstractQuadProcessor {
 
 	@Override
 	public ProcessingResult processQuadInner(MutableQuadView quad, TextureAtlasSprite sprite, BlockAndTintGetter blockView, BlockState appearanceState, BlockState state, BlockPos pos, Supplier<RandomSource> randomSupplier, int pass, ProcessingContext context) {
+		RenderType currentRenderType = CtmBakedModel.THREAD_LOCAL_RENDER_TYPE.get();
+		if (!SimpleOverlayQuadProcessor.isLayerCompatible(material.blendMode(), currentRenderType)) {
+			return ProcessingResult.NEXT_PROCESSOR;
+		}
+
 		Direction lightFace = quad.lightFace();
 		OverlayEmitter emitter = getEmitter(blockView, appearanceState, state, pos, lightFace, sprite, DirectionMaps.getMap(lightFace)[0], context);
 		if (emitter != null) {

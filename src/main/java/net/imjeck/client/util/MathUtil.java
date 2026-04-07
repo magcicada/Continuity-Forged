@@ -43,14 +43,26 @@ public final class MathUtil {
 		return (int) (((z ^ (z >>> 28)) * 0xcb24d0a5c88c35b3L) >>> 32);
 	}
 
-	public static int mix(int x, int y, int z, int face, int loops) {
-		return mix32((coordHash(x, y, z) ^ mix64(GOLDEN_GAMMA * (1 + face))) + GOLDEN_GAMMA * (1 + loops));
+	// OptiFine-compatible hash function for deterministic per-block random
+	public static int intHash(int x) {
+		x = x ^ 61 ^ x >> 16;
+		x += x << 3;
+		x ^= x >> 4;
+		x *= 668265261;
+		return x ^ x >> 15;
 	}
 
-	private static long coordHash(int x, int y, int z) {
-		long l = (long)(x * 3129871) ^ (long)z * 116129781L ^ (long)y;
-		l = l * l * 42317861L + l * 11L;
-		return l >> 16;
+	// OptiFine-compatible position+face random seed
+	public static int mix(int x, int y, int z, int face, int loops) {
+		int i = intHash(face + 37);
+		i = intHash(i + x);
+		i = intHash(i + z);
+		i = intHash(i + y);
+		int result = i & Integer.MAX_VALUE;
+		for (int j = 0; j < loops; j++) {
+			result = intHash(result);
+		}
+		return result;
 	}
 
 	public static int removeSignBit(int value) {

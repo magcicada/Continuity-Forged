@@ -8,6 +8,7 @@ import org.jetbrains.annotations.Nullable;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.imjeck.api.client.QuadProcessor;
+import net.imjeck.client.model.CtmBakedModel;
 import net.imjeck.client.processor.ProcessingDataKeys;
 import net.imjeck.client.processor.ProcessingPredicate;
 import net.imjeck.client.processor.simple.SimpleQuadProcessor;
@@ -21,6 +22,7 @@ import net.imjeck.client.render.BlendMode;
 import net.imjeck.client.render.RenderMaterial;
 import net.imjeck.client.render.MutableQuadView;
 import net.imjeck.client.render.QuadEmitter;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
@@ -43,6 +45,11 @@ public class SimpleOverlayQuadProcessor extends SimpleQuadProcessor {
 
 	@Override
 	public ProcessingResult processQuad(MutableQuadView quad, TextureAtlasSprite sprite, BlockAndTintGetter blockView, BlockState appearanceState, BlockState state, BlockPos pos, Supplier<RandomSource> randomSupplier, int pass, ProcessingContext context) {
+		RenderType currentRenderType = CtmBakedModel.THREAD_LOCAL_RENDER_TYPE.get();
+		if (!isLayerCompatible(material.blendMode(), currentRenderType)) {
+			return ProcessingResult.NEXT_PROCESSOR;
+		}
+
 		if (processingPredicate.shouldProcessQuad(quad, sprite, blockView, appearanceState, state, pos, context)) {
 			TextureAtlasSprite newSprite = spriteProvider.getSprite(quad, sprite, blockView, appearanceState, state, pos, randomSupplier, context);
 			if (newSprite != null && !TextureUtil.isMissingSprite(newSprite)) {
@@ -52,6 +59,25 @@ public class SimpleOverlayQuadProcessor extends SimpleQuadProcessor {
 			}
 		}
 		return ProcessingResult.NEXT_PROCESSOR;
+	}
+
+	protected static boolean isLayerCompatible(BlendMode blendMode, @Nullable RenderType currentRenderType) {
+		if (currentRenderType == null || blendMode == BlendMode.DEFAULT) {
+			return true;
+		}
+		if (blendMode == BlendMode.SOLID) {
+			return currentRenderType == RenderType.solid();
+		}
+		if (blendMode == BlendMode.CUTOUT_MIPPED) {
+			return currentRenderType == RenderType.cutoutMipped();
+		}
+		if (blendMode == BlendMode.CUTOUT) {
+			return currentRenderType == RenderType.cutout();
+		}
+		if (blendMode == BlendMode.TRANSLUCENT) {
+			return currentRenderType == RenderType.translucent();
+		}
+		return true;
 	}
 
 	public static class OverlayEmitter implements Consumer<QuadEmitter> {

@@ -60,12 +60,20 @@ public class ProcessingContextImpl implements QuadProcessor.ProcessingContext {
 	}
 
 	public void outputTo(QuadEmitter emitter) {
+		outputOverlaysTo(emitter);
+		outputMeshesTo(emitter);
+	}
+
+	public void outputOverlaysTo(QuadEmitter emitter) {
 		if (!emitterConsumers.isEmpty()) {
 			int amount = emitterConsumers.size();
 			for (int i = 0; i < amount; i++) {
 				emitterConsumers.get(i).accept(emitter);
 			}
 		}
+	}
+
+	public void outputMeshesTo(QuadEmitter emitter) {
 		if (!meshes.isEmpty()) {
 			int amount = meshes.size();
 			for (int i = 0; i < amount; i++) {

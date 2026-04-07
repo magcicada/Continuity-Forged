@@ -55,8 +55,18 @@ public class MutableQuadView extends QuadView {
 		return this;
 	}
 
+	public MutableQuadView tintIndex(int tintIndex) {
+		this.tintIndex = tintIndex;
+		return this;
+	}
+
 	public MutableQuadView cullFace(Direction face) {
 		this.cullFace = face;
+		return this;
+	}
+
+	public MutableQuadView shade(boolean shade) {
+		this.shade = shade;
 		return this;
 	}
 

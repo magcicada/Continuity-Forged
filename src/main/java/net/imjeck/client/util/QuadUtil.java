@@ -41,10 +41,22 @@ public final class QuadUtil {
 
 	public static void emitOverlayQuad(QuadEmitter emitter, Direction face, TextureAtlasSprite sprite, int color, RenderMaterial material) {
 		emitter.square(face, 0, 0, 1, 1, 0);
-		emitter.color(color, color, color, color);
+		// Convert ARGB (from BlockColors) to vertex data format (ABGR byte order)
+		int vertexColor = (color & 0xFF00FF00) | ((color & 0xFF) << 16) | ((color >> 16) & 0xFF);
+		emitter.color(vertexColor, vertexColor, vertexColor, vertexColor);
 		assignLerpedUvs(emitter, sprite);
 		emitter.material(material);
 		emitter.sprite(sprite);
+		emitter.tintIndex(-1);
+		// Match OptiFine: shade=true enables AO and face-dependent dimming
+		emitter.shade(true);
+		// Set face normal for all vertices (required for correct lighting)
+		float nx = face.getStepX();
+		float ny = face.getStepY();
+		float nz = face.getStepZ();
+		for (int i = 0; i < 4; i++) {
+			emitter.normal(i, nx, ny, nz);
+		}
 		emitter.emit();
 	}
 
@@ -82,13 +94,15 @@ public final class QuadUtil {
 			}
 		}
 
+		// Allow shell expansion up to 0.001 for anti-z-fighting bilayer models
+		final float epsilon = 0.001f;
 		for (int i = 0; i < 4; i++) {
 			float a = quad.posByIndex(i, indexA);
-			if ((a >= 0.0001f || a <= -0.0001f) && (a >= 1.0001f || a <= 0.9999f)) {
+			if ((a >= epsilon || a <= -epsilon) && (a >= 1 + epsilon || a <= 1 - epsilon)) {
 				return false;
 			}
 			float b = quad.posByIndex(i, indexB);
-			if ((b >= 0.0001f || b <= -0.0001f) && (b >= 1.0001f || b <= 0.9999f)) {
+			if ((b >= epsilon || b <= -epsilon) && (b >= 1 + epsilon || b <= 1 - epsilon)) {
 				return false;
 			}
 		}

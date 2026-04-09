@@ -2,6 +2,23 @@ plugins {
 	id 'net.minecraftforge.gradle' version '[6.0.16,6.2)'
 	id 'maven-publish'
 	id 'org.spongepowered.mixin' version '0.7.38'
+	//id 'net.minecraftforge.gradle' version '6.0.+'
+	id 'com.diffplug.spotless' version '6.25.0'
+}
+
+spotless {
+	java {
+		removeUnusedImports()
+
+		googleJavaFormat('1.17.0')
+
+		// eclipse().configFile('eclipse-format.xml')
+
+		trimTrailingWhitespace()
+		endWithNewline()
+
+		// target 'src/main/java/**/*.java'
+	}
 }
 
 version = project.mod_version
@@ -28,7 +45,7 @@ minecraft {
 			property 'mixin.env.refMapRemappingFile', "${project.buildDir}/createSrgToMcp/output.srg"
 
 			mods {
-				continuity_forged {
+				continuity {
 					source sourceSets.main
 				}
 			}
@@ -36,12 +53,22 @@ minecraft {
 	}
 }
 
+repositories {
+	mavenCentral()
+	maven { url = "https://jitpack.io" }
+}
+
 dependencies {
 	minecraft "net.minecraftforge:forge:${project.forge_version}"
 
+	implementation "io.github.llamalad7:mixinextras-forge:0.4.1"
+
 	annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
-	compileOnly files("F:/Game/Minecraft/Mymodpack/libraries/io/github/llamalad7/mixinextras-common/0.4.1/mixinextras-common-0.4.1.jar")
-	annotationProcessor files("F:/Game/Minecraft/Mymodpack/libraries/io/github/llamalad7/mixinextras-common/0.4.1/mixinextras-common-0.4.1.jar")
+	annotationProcessor "io.github.llamalad7:mixinextras-common:0.4.1"
+
+	compileOnly "io.github.llamalad7:mixinextras-common:0.4.1"
+	//compileOnly files("F:/Game/Minecraft/Mymodpack/libraries/io/github/llamalad7/mixinextras-common/0.4.1/mixinextras-common-0.4.1.jar")
+	//annotationProcessor files("F:/Game/Minecraft/Mymodpack/libraries/io/github/llamalad7/mixinextras-common/0.4.1/mixinextras-common-0.4.1.jar")
 }
 
 tasks.withType(JavaCompile).configureEach {
@@ -49,8 +76,8 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 mixin {
-	add sourceSets.main, 'continuity_forged.mixins.refmap.json'
-	config 'continuity_forged.mixins.json'
+	add sourceSets.main, 'continuity.mixins.refmap.json'
+	config 'continuity.mixins.json'
 }
 
 processResources {
@@ -68,14 +95,14 @@ jar {
 
 	manifest {
 		attributes([
-				"Specification-Title"     : "continuity_forged",
+				"Specification-Title"     : "continuity",
 				"Specification-Vendor"    : "PepperBell",
 				"Specification-Version"   : "1",
 				"Implementation-Title"    : project.name,
 				"Implementation-Vendor"   : "PepperBell",
 				"Implementation-Version"  : project.jar.archiveVersion,
 				"Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-				"MixinConfigs"            : "continuity_forged.mixins.json"
+				"MixinConfigs"            : "continuity.mixins.json"
 		])
 	}
 }

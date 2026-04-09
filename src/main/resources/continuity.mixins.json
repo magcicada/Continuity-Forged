@@ -1,0 +1,25 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "me.pepperbell.continuity.client.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "continuity.mixins.refmap.json",
+  "client": [
+    "AtlasLoaderMixin",
+    "BakedModelManagerMixin",
+    "FallingBlockEntityRendererMixin",
+    "IdentifierMixin",
+    "LifecycledResourceManagerImplMixin",
+    "ModelBlockRendererMixin",
+    "ModelLoaderMixin",
+    "NamespaceResourceManagerMixin",
+    "PistonBlockEntityRendererMixin",
+    "ReloadableResourceManagerImplAccessor",
+    "RenderLayersMixin",
+    "SpriteLoaderMixin",
+    "SpriteMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

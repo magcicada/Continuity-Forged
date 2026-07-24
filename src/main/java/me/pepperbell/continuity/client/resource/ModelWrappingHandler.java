@@ -24,15 +24,15 @@ public class ModelWrappingHandler {
     this.wrapCtm = wrapCtm;
     this.wrapEmissive = wrapEmissive;
     blockStateModelIds = createBlockStateModelIdMap();
-  }
+    }
 
   @Nullable
   public static ModelWrappingHandler create(boolean wrapCtm, boolean wrapEmissive) {
     if (!wrapCtm && !wrapEmissive) {
       return null;
-    }
+        }
     return new ModelWrappingHandler(wrapCtm, wrapEmissive);
-  }
+    }
 
   private static ImmutableMap<ModelResourceLocation, BlockState> createBlockStateModelIdMap() {
     ImmutableMap.Builder<ModelResourceLocation, BlockState> builder = ImmutableMap.builder();
@@ -41,29 +41,30 @@ public class ModelWrappingHandler {
       for (BlockState state : block.getStateDefinition().getPossibleStates()) {
         ModelResourceLocation modelId = BlockModelShaper.stateToModelLocation(blockId, state);
         builder.put(modelId, state);
-      }
-    }
+            }
+        }
     return builder.build();
-  }
+    }
 
   public BakedModel wrap(@Nullable BakedModel model, ResourceLocation modelId) {
     if (model != null
         && !model.isCustomRenderer()
         && !modelId.equals(ModelBakery.MISSING_MODEL_LOCATION)) {
-      if (wrapCtm) {
+
         if (modelId instanceof ModelResourceLocation) {
           BlockState state = blockStateModelIds.get(modelId);
           if (state != null) {
+            if (wrapCtm) {
             model = new CtmBakedModel(model, state);
-          }
-        }
-      }
+            }
       if (wrapEmissive) {
         model = new EmissiveBakedModel(model);
-      }
-    }
+                    }
+                }
+            }
+        }
     return model;
-  }
+    }
 
   public static void onModifyBakingResult(
       net.minecraftforge.client.event.ModelEvent.ModifyBakingResult event) {
@@ -76,8 +77,8 @@ public class ModelWrappingHandler {
         BakedModel wrapped = wrappingHandler.wrap(entry.getValue(), entry.getKey());
         if (wrapped != entry.getValue()) {
           entry.setValue(wrapped);
+                }
+            }
         }
-      }
     }
-  }
 }
